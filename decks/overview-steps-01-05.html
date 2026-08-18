@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FX exchange · Steps 1–5 — Docker, Compose &amp; the full stack</title>
+<style>
+  :root{--bg:#0f1420;--panel:#182234;--panel2:#1f2c42;--ink:#e8edf5;--muted:#9fb0c7;
+        --mint:#4bd6a0;--blue:#5aa2ff;--amber:#e6a15a;--red:#ff6b6b;--border:#2a3852}
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);
+       font:16px/1.65 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif}
+  code,kbd{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:.92em}
+  code{background:#0b0f18;padding:1px 5px;border-radius:4px;color:#cfe3ff}
+  a{color:var(--blue)}
+  .wrap{max-width:1080px;margin:0 auto;padding:0 24px 64px}
+  .hero{background:var(--panel);border-bottom:1px solid var(--border);padding:28px 0 22px;margin-bottom:28px}
+  .crumb{color:var(--muted);font-size:13px;letter-spacing:1.4px;text-transform:uppercase}
+  h1{margin:8px 0 10px;font-size:30px;line-height:1.25}
+  h2{font-size:15px;text-transform:uppercase;letter-spacing:1.2px;color:var(--muted);
+     margin:38px 0 14px;border-bottom:1px solid var(--border);padding-bottom:8px}
+  .goal{color:#cfd9e8;max-width:76ch}
+  .daynav{display:flex;flex-wrap:wrap;gap:6px;margin-top:16px}
+  .daynav span{font-size:12px;padding:4px 9px;border:1px solid var(--border);border-radius:99px;color:var(--muted)}
+  .daynav span.here{background:rgba(75,214,160,.15);border-color:var(--mint);color:var(--mint);font-weight:600}
+  ul.ach{list-style:none;padding:0;display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:8px}
+  ul.ach li{background:var(--panel);border:1px solid var(--border);border-radius:8px;padding:10px 14px;font-size:15px}
+  .task{background:var(--panel);border:1px solid var(--border);border-left:3px solid var(--blue);
+        border-radius:8px;padding:16px 18px;margin-bottom:14px}
+  .task.done{opacity:.55;border-left-color:var(--mint)}
+  .task h3{margin:0 0 4px;font-size:18px}
+  .task h3 a{text-decoration:none}
+  .meta{color:var(--muted);font-size:13px;margin-bottom:10px}
+  .why{color:var(--amber);font-size:14px;margin:0 0 8px}
+  .task p{margin:0 0 8px}
+  .cp{background:#0b0f18;border-left:3px solid var(--mint);padding:9px 12px;border-radius:0 6px 6px 0;
+      font-size:14px;margin-top:10px}
+  .cp b{color:var(--mint)}
+  label.chk{display:flex;align-items:center;gap:8px;color:var(--muted);font-size:13px;
+            cursor:pointer;user-select:none;margin-bottom:8px}
+  .theory{background:var(--panel2);border:1px solid var(--border);border-radius:8px;padding:14px 18px;margin-bottom:12px}
+  .theory h4{margin:0 0 6px;font-size:16px;color:var(--mint)}
+  .theory p{margin:0 0 8px;font-size:15px;color:#d5e0ee}
+  .cols{display:grid;grid-template-columns:repeat(auto-fit,minmax(330px,1fr));gap:16px}
+  table{width:100%;border-collapse:collapse;font-size:14px}
+  th,td{text-align:left;padding:7px 9px;border-bottom:1px solid var(--border);vertical-align:top}
+  th{color:var(--muted);font-size:12px;text-transform:uppercase;letter-spacing:.9px}
+  .sheet{background:var(--panel);border:1px solid var(--border);border-radius:8px;padding:6px 14px 10px}
+  .sheet h4{color:var(--blue);font-size:14px;margin:12px 0 4px;text-transform:uppercase;letter-spacing:1px}
+  details.hint{margin-top:8px;font-size:14px}
+  details.hint summary{cursor:pointer;color:var(--amber)}
+  .xtra{border-left-color:var(--amber)}
+  .genai{background:var(--panel);border:1px dashed var(--mint);border-radius:8px;padding:16px 18px;margin-bottom:14px}
+  footer{margin-top:46px;padding-top:18px;border-top:1px solid var(--border);color:var(--muted);font-size:14px}
+  .warn{background:rgba(230,161,90,.12);border:1px solid var(--amber);border-radius:8px;
+        padding:12px 16px;color:#f0d3ae;font-size:14px;margin:14px 0}
+  @media (prefers-color-scheme: light){
+    :root{--bg:#f6f8fb;--panel:#fff;--panel2:#eef3f9;--ink:#16202f;--muted:#5b6b80;--border:#d4dce7}
+    code{background:#eef2f7;color:#22405f}
+  }
+</style>
+</head>
+<body>
+
+<header class="hero"><div class="wrap">
+  <div class="crumb">FX exchange · Steps 1–5</div>
+  <h1>Ship the machine: Docker, Compose, Liquibase &amp; a live full stack</h1>
+  <p class="goal">
+    Your API works — on your laptop, with your JDK, your Gradle and your hand-installed MySQL.
+    Here all of that goes in a box that anyone can run. <em>Done looks like:</em> five containers,
+    two databases and a browser page where a toggle visibly changes the behaviour of a service two
+    hops away — all raised by one <code>docker compose up</code> on a machine with nothing installed.
+  </p>
+  <div class="daynav">
+    <span class="here">Steps 1–5 · Containers, Compose, Liquibase</span><span><a href="overview-steps-06-09.html">Steps 6–9 · Tests, CI &amp; CD</a></span>
+  </div>
+</div></header>
+
+<div class="wrap">
+
+<div class="warn" style="border-color:var(--blue);background:rgba(90,162,255,.1);color:#cfe3ff">
+  <strong>New here, or lost between tasks?</strong>
+  <a href="diagrams/">Twelve diagrams</a> — the system after every step, the feed loop as a
+  sequence, and a screenshot of the finished thing. Same content as a
+  <a href="architecture-steps-01-05.html">click-through deck</a>.
+</div>
+
+<h2>By the end of Step 5 you can…</h2>
+<ul class="ach">
+  <li>🧱 Write a multi-stage <code>Dockerfile</code> and explain every line of it</li>
+  <li>⚡ Order instructions so a one-character fix doesn't re-download the internet</li>
+  <li>🔌 Explain <em>whose</em> <code>localhost</code> a container is talking to</li>
+  <li>🗂️ Raise an app + database together with one command</li>
+  <li>💾 Say what <code>down</code> keeps and <code>down -v</code> destroys, and why</li>
+  <li>🧬 Version a schema as code, and rebuild a database from nothing</li>
+  <li>🔧 Recognise a checksum failure, a failed migration and a stuck changelog lock</li>
+  <li>🚪 Diagnose "port is already allocated" in one glance</li>
+  <li>🛰️ Implement someone else's integration contract, in both directions</li>
+</ul>
+
+<h2>Before you start</h2>
+<div class="sheet">
+<pre><code>docker --version                     # Docker Desktop up and answering?
+docker compose version               # v2 — the subcommand, not docker-compose
+
+mkdir fx-exchange &amp;&amp; cd fx-exchange  # this starts a NEW repo — your own
+git init -b main
+cp -R ../mini-project/start/. .
+# ...write README.md with YOUR NAME in it...
+git add . &amp;&amp; git commit -m "chore: fx-app-spring and README"
+git remote add origin git@github.com:&lt;you&gt;/fx-exchange.git
+git push -u origin main               # baseline on main BEFORE any work
+git switch -c step-01                # then one branch per step</code></pre>
+<p style="color:var(--muted);font-size:14px;margin:10px 0 0">
+  <strong>One branch per step</strong> — <code>step-01</code> … <code>step-05</code> —
+  each merged to <code>main</code> through a pull request. Nobody commits straight to
+  <code>main</code>: it costs nothing while you are alone in the repo, and it is the habit that
+  keeps a team from standing on each other later.
+</p>
+<p style="color:var(--muted);font-size:14px;margin:10px 0 0">
+  Three applications, <strong>side by side</strong> — none inside another. Each owns its own
+  <code>Dockerfile</code> at the root of its own folder; <code>docker-compose.yml</code> sits at
+  the workspace root and wires them together. Add a <code>README.md</code> there with
+  <strong>your name</strong> on it.
+</p>
+<pre><code>fx-exchange/
+├── README.md
+├── docker-compose.yml       ← Step 2
+├── fx-app-spring/           ← the API (Dockerfile at ITS root)
+├── fx-monitor/              ← Step 4 — beside, not inside
+└── fx-orchestrator/         ← Step 5 — also beside</code></pre>
+</div>
+<div class="warn">
+  <strong>Docker Desktop must be running.</strong> If it won't install on your laptop, say so at
+  stand-up <em>now</em> and pair with someone whose machine works — every task after the first
+  builds on a running stack. Keep <strong>two terminals</strong> open all day: one for
+  <code>docker compose logs -f</code>, one for everything else. The lessons live in the logs.
+</div>
+
+<h2>The steps</h2>
+
+<div class="task" id="t1">
+  <label class="chk"><input type="checkbox" data-k="step1"> mark done</label>
+  <h3><a href="../steps/01-dockerfile.md">1 · Put it in a box</a></h3>
+  <div class="meta">AM · ~65 min · deck: Containerisation / Dockerfiles</div>
+  <p class="why">Why: "works on my machine" is a bug report, not a status.</p>
+  <p><strong>Start a new repo, and no database needed — stop MySQL for this one.</strong>
+     Lay the workspace out first (three siblings, README with your name), then write the
+     Dockerfile in stages
+     and run it after each: naive single-stage → publish a port → diagnose the
+     <em>whose localhost?</em> failure (and deliberately <em>not</em> fix it) → multi-stage →
+     prove the layer cache by touching a file → <code>.dockerignore</code> → override config with
+     <code>-e</code> → volumes and bind mounts → the everyday
+     <code>ps/logs/exec/images</code> commands.</p>
+  <details class="hint"><summary>Stuck?</summary>
+    The container starting is <em>not</em> the app working — the pool is lazy, so
+    <code>/health</code> is green while <code>/api/rates</code> is 500. Read the container log,
+    not the HTTP body.</details>
+  <div class="cp"><b>Checkpoint:</b> <code>/health</code> UP · <code>/</code> 404 ·
+    <code>/api/health/db</code> DOWN · <code>/api/rates</code> 500 — running with
+    <b>no JDK, no Gradle and no MySQL</b>. Multi-stage image smaller; rebuild leaves
+    <code>go-offline</code> CACHED. The 10 rates arrive in Step 2.</div>
+</div>
+
+<div class="task" id="t2">
+  <label class="chk"><input type="checkbox" data-k="step2"> mark done</label>
+  <h3><a href="../steps/02-compose-mysql.md">2 · The whole stack in one file</a></h3>
+  <div class="meta">AM · ~60 min · deck: Containerisation</div>
+  <p class="why">Why: the app was portable, the database still wasn't.</p>
+  <p>A <code>db</code> service and an app service, wired by <strong>service name</strong> not
+     <code>localhost</code>. Healthcheck + <code>depends_on: condition:</code>, named volume vs
+     bind mount, <code>.env</code> and <code>${VAR:-default}</code>, and the
+     <code>down</code> / <code>down -v</code> experiment that explains why your seed edits
+     "did nothing".</p>
+  <details class="hint"><summary>Stuck?</summary>
+    <code>3307:3306</code> — left is your laptop, right is inside. Container-to-container traffic
+    uses the <em>right</em> one.</details>
+  <div class="cp"><b>Checkpoint:</b> local MySQL <b>stopped</b>, <code>docker compose up</code>
+    serves 10 rates; <code>down -v &amp;&amp; up</code> re-seeds from scratch.</div>
+</div>
+
+<div class="task" id="t3">
+  <label class="chk"><input type="checkbox" data-k="step3"> mark done</label>
+  <h3><a href="../steps/03-liquibase.md">3 · Liquibase owns the schema</a></h3>
+  <div class="meta">PM · ~70 min · deck: Data migrations (gap-fill)</div>
+  <p class="why">Why: the shape of your database is the last thing you own that isn't code.</p>
+  <p>Change sets in YAML, seed data as <code>sqlFile</code>, the init-script mount
+     <strong>deleted</strong>, and <code>DATABASECHANGELOG</code> read as the ledger it is. Then
+     break it three ways on purpose — an edited applied change set, bad DDL, and a stuck
+     <code>DATABASECHANGELOGLOCK</code> — and fix each.</p>
+  <details class="hint"><summary>Stuck?</summary>
+    Never edit a change set that has already run. The fix is always a <em>new</em> one.
+    <code>clearCheckSums</code> means "trust the files, forget what actually ran".</details>
+  <div class="cp"><b>Checkpoint:</b> with <b>no seed file mounted</b>,
+    <code>down -v &amp;&amp; up</code> rebuilds schema + data: 8/20/30/200 rows, EUR/USD <b>1.0818</b>.</div>
+</div>
+
+<div class="task" id="t4">
+  <label class="chk"><input type="checkbox" data-k="step4"> mark done</label>
+  <h3><a href="../steps/04-monitor-and-ports.md">4 · A second app, and the port fight</a></h3>
+  <div class="meta">PM · ~45 min · deck: Containerisation</div>
+  <p class="why">Why: most containers you'll ever run were built by someone else.</p>
+  <p><code>fx-monitor</code> is given complete — containerise it, add it to the stack, hit
+     <code>port is already allocated</code>, and work out which of the two numbers caused it.
+     nginx serves the page <em>and</em> proxies <code>/api</code> onward, so the browser stays
+     same-origin and CORS never enters the picture.</p>
+  <details class="hint"><summary>Stuck?</summary>
+    Container ports are private to each container; published host ports are shared across your
+    whole machine. It is always the left-hand number.</details>
+  <div class="cp"><b>Checkpoint:</b> three services up · <code>http://localhost:3000</code> renders
+    the live table · the toggle is greyed out with a 404 banner (correct — that's Step 5).</div>
+</div>
+
+<div class="task" id="t5">
+  <label class="chk"><input type="checkbox" data-k="step5"> mark done</label>
+  <h3><a href="../steps/05-orchestrator-feed.md">5 · The orchestrator loop</a></h3>
+  <div class="meta">PM · ~80 min · deck: Containerisation + REST</div>
+  <p class="why">Why: a service you don't control is now depending on your answer.</p>
+  <p><code>fx-orchestrator</code> pushes a batch of rates every two seconds and waits for your
+     ACK. Build the inbound endpoint (202), store the ticks, call <strong>out</strong> over
+     <code>RestTemplate</code> with ACCEPTED or DECLINED, and add the toggle that decides which.
+     Evolve <code>fx_rate</code> forward with a new change set — Step 3's rule, in production form.</p>
+  <details class="hint"><summary>Stuck?</summary>
+    Read the orchestrator's log first — it names the exact URL, the exact JSON, and what it thinks
+    you got wrong.</details>
+  <div class="cp"><b>Checkpoint:</b> toggle <b>ON</b> → values move, batches every <b>2s</b>,
+    <code>fx_rate</code> grows · <b>OFF</b> → frozen, DECLINED, <b>10s</b> ·
+    <code>/api/rates</code> still returns exactly <b>10</b> rows either way.</div>
+</div>
+
+<div class="genai">
+  <h3 style="margin:0 0 4px"><a href="../steps/06-test-tiers.md">GenAI closer — build the habit that saves you</a></h3>
+  <div class="meta">~10 min</div>
+  <p>Have an assistant review your <code>Dockerfile</code>, then price every suggestion before
+     taking one. Then ask it the startup-race question you already know the answer to, and see
+     whether it reaches for a <code>sleep</code>.</p>
+</div>
+
+<h2>Theory background</h2>
+
+<div class="theory">
+  <h4>A container is a process, not a computer</h4>
+  <p>No second operating system is booted. Your process runs on the same kernel as everything
+     else, with its own <em>view</em> of the world: its own filesystem, its own process list, its
+     own network interface. That is why it starts in milliseconds and why
+     <code>localhost</code> means something different inside it.</p>
+</div>
+
+<div class="theory">
+  <h4>Images are layers, and order is everything</h4>
+  <p>Each instruction adds a read-only layer; a container adds one thin writable layer on top.
+     Docker re-runs a layer only when the files it copies have changed — <em>and every layer after
+     it</em>. Copy <code>build.gradle</code> and resolve dependencies <strong>before</strong> copying
+     <code>src</code>, and a source edit rebuilds in seconds instead of minutes.</p>
+</div>
+
+<div class="theory">
+  <h4>Two ports, two different jobs</h4>
+  <p><code>-p 3000:80</code> — the <strong>left</strong> is a port on your laptop, a scarce
+     machine-wide resource; the <strong>right</strong> is inside the container, private to it.
+     Ten containers can all use port 80 internally. Only one can publish on host 3000. Every
+     "port is already allocated" is about the left-hand number.</p>
+</div>
+
+<div class="theory">
+  <h4>Compose networking: names, not addresses</h4>
+  <p>Every service gets a DNS name equal to its service name, resolved on an internal network.
+     <code>fx-db:3306</code> works and doesn't care what IP the container happens to have. And
+     "started" ≠ "ready": a healthcheck plus <code>depends_on: condition: service_healthy</code>
+     is the difference between a reliable stack and one that works on the second try.</p>
+</div>
+
+<div class="theory">
+  <h4>Migrations: the schema is code too</h4>
+  <p>Liquibase keeps an ordered list of change sets and records in the database itself which ones
+     it has run. Empty database → whole schema. Current database → nothing. Three behind → three
+     applied. The one rule: <strong>never edit a change set that has already run.</strong> It was
+     hashed when it ran; change the file and the hashes disagree, and Liquibase stops rather than
+     guess.</p>
+</div>
+
+<h2>Cheatsheet</h2>
+<div class="cols">
+
+<div class="sheet">
+<h4>Images &amp; containers</h4>
+<table>
+<tr><td><code>docker build -t name:tag .</code></td><td>build from ./Dockerfile</td></tr>
+<tr><td><code>docker images</code></td><td>what you've built, and how big</td></tr>
+<tr><td><code>docker run -p 8080:8080 img</code></td><td>run, publishing a port</td></tr>
+<tr><td><code>-e KEY=value</code></td><td>override config at run time</td></tr>
+<tr><td><code>-v name:/path</code></td><td>named volume (Docker owns it)</td></tr>
+<tr><td><code>-v "$PWD/dir:/path:ro"</code></td><td>bind mount, read-only</td></tr>
+<tr><td><code>docker ps -a</code></td><td>running <em>and</em> dead containers</td></tr>
+<tr><td><code>docker logs &lt;id&gt;</code></td><td>its stdout, after the fact</td></tr>
+<tr><td><code>docker exec -it &lt;id&gt; sh</code></td><td>a shell inside it</td></tr>
+</table>
+</div>
+
+<div class="sheet">
+<h4>Dockerfile</h4>
+<table>
+<tr><td><code>FROM x AS build</code></td><td>named stage, for multi-stage</td></tr>
+<tr><td><code>COPY --from=build a b</code></td><td>take only the artifact across</td></tr>
+<tr><td><code>WORKDIR /app</code></td><td>cd, and create if needed</td></tr>
+<tr><td><code>RUN cmd</code></td><td>runs at <em>build</em> time → a layer</td></tr>
+<tr><td><code>ENTRYPOINT ["java","-jar",…]</code></td><td>runs at <em>start</em> time</td></tr>
+<tr><td><code>EXPOSE 8080</code></td><td>documentation; <code>-p</code> publishes</td></tr>
+<tr><td><code>.dockerignore</code></td><td>keeps the build context small</td></tr>
+</table>
+</div>
+
+<div class="sheet">
+<h4>Compose</h4>
+<table>
+<tr><td><code>up --build -d</code></td><td>build then start detached</td></tr>
+<tr><td><code>ps</code></td><td>state + published ports</td></tr>
+<tr><td><code>logs -f &lt;svc&gt;</code></td><td>follow one service</td></tr>
+<tr><td><code>exec &lt;svc&gt; bash</code></td><td>shell into a service</td></tr>
+<tr><td><code>down</code></td><td>remove containers, <b>keep</b> volumes</td></tr>
+<tr><td><code>down -v</code></td><td>…and destroy volumes</td></tr>
+<tr><td><code>config</code></td><td>show the fully-resolved file</td></tr>
+<tr><td><code>${VAR:-default}</code></td><td>value from <code>.env</code>, or fallback</td></tr>
+</table>
+</div>
+
+<div class="sheet">
+<h4>Liquibase</h4>
+<table>
+<tr><td><code>db.changelog-master.yaml</code></td><td>ordered table of contents</td></tr>
+<tr><td><code>changeSet: id + author</code></td><td>+ file path = its identity</td></tr>
+<tr><td><code>createTable / addColumn</code></td><td>schema, dialect-independent</td></tr>
+<tr><td><code>sqlFile / sql</code></td><td>raw SQL when that's clearer</td></tr>
+<tr><td><code>DATABASECHANGELOG</code></td><td>what has run, in order, hashed</td></tr>
+<tr><td><code>DATABASECHANGELOGLOCK</code></td><td>stuck here → "Waiting for lock…"</td></tr>
+<tr><td>checksum error</td><td>you edited an applied change set</td></tr>
+</table>
+</div>
+
+</div>
+
+<h2>Extra challenges</h2>
+
+<div class="task xtra">
+  <h3>Shrink the image</h3>
+  <p>Try <code>eclipse-temurin:21-jre-alpine</code>, then a <code>jlink</code>-trimmed runtime.
+     Record the sizes. Then find the cost: what changed about libc, DNS, or your JVM flags?
+     A smaller number that breaks in production is not a win.</p>
+</div>
+
+<div class="task xtra">
+  <h3>Run as a non-root user</h3>
+  <p>Add a <code>USER</code> to the runtime stage and make the app still work — including the log
+     volume. This is the single highest-value hardening step for a container, and the one most
+     likely to break something quietly.</p>
+</div>
+
+<div class="task xtra">
+  <h3>Roll one back</h3>
+  <p>Every change set you wrote has a <code>rollback:</code> block. Add the
+     <code>org.liquibase.gradle</code> plugin, roll back the last one, look at what happened to
+     <code>DATABASECHANGELOG</code>, and then
+     reapply it. When is rollback genuinely usable, and when is "roll forward" the only honest
+     option?</p>
+</div>
+
+<div class="task xtra">
+  <h3>Make the feed misbehave</h3>
+  <p><code>fx-orchestrator</code> reads <code>fx.delay.*</code> and <code>fx.ack.timeout</code>
+     from its environment. Set the ACK timeout below your own response time and watch it declare
+     NO_ACK for batches you <em>did</em> answer. That's a real distributed-systems failure —
+     the answer arrived, just too late to count.</p>
+</div>
+
+<footer>
+  Entry point: <a href="../README.md">README.md</a> ·
+  Diagrams: <a href="diagrams/">diagrams/</a> (or the <a href="architecture-steps-01-05.html">deck</a>) ·
+  Answers: <a href="../solutions/">solution/</a> (five runnable stacks, one per task) ·
+  Start here: <a href="../README.md">the mini-project README</a>.
+  <br><br>
+  Next: the machines take over the checking — three altitudes of tests, CI on every push, and
+  a CD pipeline that ships the images you built here.
+</footer>
+
+</div>
+
+<script>
+  document.querySelectorAll('input[data-k]').forEach(function(box){
+    var key = 'fx-' + box.dataset.k;
+    box.checked = localStorage.getItem(key) === '1';
+    box.closest('.task').classList.toggle('done', box.checked);
+    box.addEventListener('change', function(){
+      localStorage.setItem(key, box.checked ? '1' : '0');
+      box.closest('.task').classList.toggle('done', box.checked);
+    });
+  });
+</script>
+</body>
+</html>

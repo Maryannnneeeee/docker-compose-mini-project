@@ -1,0 +1,61 @@
+customer,customer country,from currency,from currency name,to currency,amount,rate used,date,agent
+Ines Costa,UK,JPY,Japanese Yen,CAD,767.87,121.3086,12/01/2026,Branch
+FARID AZIZ,SG,JPY,Japanese Yen,USD,409.71,13.2407,Jan 12 2026,app
+Liam Murphy,UK,USD,US Dollar,CHF,5485.34,129.1823,12/01/2026,app
+ Omar Farouk,United Kingdom,USD,US Dollar,SGD,3642.5,123.5918,2026-01-12,web
+Amira Khan,DE,EUR,Euro,CAD,3544.19,106.937,12/01/2026,app
+Omar Farouk,United Kingdom,USD,US Dollar,GBP,6276.43,189.7402,2026-01-12,web
+ Elif Yilmaz,SG,USD,US Dollar,SGD,8975.64,154.0923,12/01/2026,app
+Chen Wei,United Kingdom,EUR,Euro,AUD,7677.12,135.3878,Jan 12 2026,branch
+Liam Murphy,uk,USD,US Dollar,AUD,7149.38,45.3615,12/01/2026,web
+Liam Murphy,SG,USD,US Dollar,AUD,7252.59,105.0371,Jan 12 2026,web
+Chen Wei,SG,EUR,Euro,JPY,4778.69,146.2567,Jan 12 2026,web
+Elif Yilmaz,SG,USD,US Dollar,JPY,4245.92,98.5397,2026-01-12,Branch
+Sam Njoroge,uk,CHF,Swiss Franc,EUR,3950.3,173.08,2026-01-12,web
+Quinn Doyle,uk,CAD,Canadian Dollar,EUR,2971.68,134.9184,12/01/2026,Branch
+ Jonas Berg,DE,EUR,Euro,SGD,2542.61,118.9417,Jan 12 2026,Branch
+Chen Wei,DE,EUR,Euro,AUD,8480.3,29.7198,Jan 12 2026,Branch
+Tara Kelly,DE,GBP,Pound Sterling,JPY,466.63,164.1865,2026-01-12,web
+Sam Njoroge,DE,CHF,Swiss Franc,GBP,3807.62,121.5888,12/01/2026,Branch
+Jonas Berg,SG,EUR,Euro,CAD,2279.41,153.4927,12/01/2026,app
+Omar Farouk,uk,USD,US Dollar,EUR,4012.49,92.2656,2026-01-12,app
+Tara Kelly,United Kingdom,GBP,Pound Sterling,EUR,6634.38,163.6173,12/01/2026,branch
+Liam Murphy,United Kingdom,USD,US Dollar,AUD,2251.47,23.7179,12/01/2026,branch
+ELIF YILMAZ,DE,USD,US Dollar,EUR,3821.4,182.929,2026-01-12,app
+Sam Njoroge,uk,CHF,Swiss Franc,CAD,4534.56,98.0404,12/01/2026,app
+ Priya Nair,SG,EUR,Euro,USD,8703.51,41.2699,12/01/2026,web
+Ben Osei,SG,JPY,Japanese Yen,GBP,2643.16,2.0496,2026-01-12,WEB
+Elif Yilmaz,SG,USD,US Dollar,JPY,3356.84,76.4102,Jan 12 2026,Branch
+Grace Obi,UK,USD,US Dollar,JPY,3538.5,85.8422,Jan 12 2026,app
+Tara Kelly,uk,GBP,Pound Sterling,CAD,8778.24,75.1448,12/01/2026,Branch
+LIAM MURPHY,SG,USD,US Dollar,SGD,4550.69,9.085,2026-01-12,app
+Priya Nair,DE,EUR,Euro,AUD,8048.87,26.9885,Jan 12 2026,app
+Farid Aziz,United Kingdom,JPY,Japanese Yen,CHF,5384.15,96.6362,Jan 12 2026,Branch
+Priya Nair,SG,EUR,Euro,CAD,7360.16,70.3038,Jan 12 2026,web
+Nadia Haddad,UK,AUD,Australian Dollar,CHF,5412.5,50.818,Jan 12 2026,Branch
+Sam Njoroge,DE,CHF,Swiss Franc,EUR,4375.99,99.842,Jan 12 2026,Branch
+Maya Singh,uk,CAD,Canadian Dollar,EUR,380.98,180.1849,2026-01-12,branch
+Amira Khan,uk,EUR,Euro,CHF,3775.34,39.1375,Jan 12 2026,Branch
+Priya Nair,UK,EUR,Euro,SGD,6381.4,98.7905,Jan 12 2026,app
+Priya Nair,uk,EUR,Euro,AUD,4191.01,101.5276,Jan 12 2026,app
+Ines Costa,uk,JPY,Japanese Yen,AUD,2583.16,57.0656,12/01/2026,app
+Grace Obi,United Kingdom,USD,US Dollar,CAD,4370.25,106.7124,Jan 12 2026,app
+Jonas Berg,DE,EUR,Euro,USD,3479.28,186.2404,12/01/2026,branch
+Jonas Berg,UK,EUR,Euro,USD,3182.64,84.3303,12/01/2026,WEB
+Grace Obi,United Kingdom,USD,US Dollar,GBP,8403.91,132.4245,2026-01-12,web
+Tara Kelly,uk,GBP,Pound Sterling,CAD,551.81,172.0324,2026-01-12,branch
+Ben Osei,SG,JPY,Japanese Yen,USD,994.85,146.5602,2026-01-12,Branch
+Farid Aziz,SG,JPY,Japanese Yen,CHF,4349.29,38.2969,12/01/2026,app
+JONAS BERG,DE,EUR,Euro,CAD,2166.76,140.4811,2026-01-12,branch
+Nadia Haddad,UK,AUD,Australian Dollar,SGD,8974.83,75.7305,12/01/2026,branch
+JONAS BERG,UK,EUR,Euro,USD,8363.25,63.9905,12/01/2026,Branch
+Quinn Doyle,uk,CAD,Canadian Dollar,JPY,7674.43,89.1899,2026-01-12,web
+Katya Ivanova,United Kingdom,AUD,Australian Dollar,EUR,6495.52,3.169,12/01/2026,app
+Sam Njoroge,uk,CHF,Swiss Franc,CAD,5537.5,121.5385,12/01/2026,WEB
+QUINN DOYLE,uk,CAD,Canadian Dollar,GBP,8837.0,90.9776,2026-01-12,web
+Ines Costa,United Kingdom,JPY,Japanese Yen,CHF,8590.91,57.7187,Jan 12 2026,Branch
+Amira Khan,uk,EUR,Euro,JPY,652.91,22.9036,12/01/2026,branch
+Maya Singh,United Kingdom,CAD,Canadian Dollar,AUD,6243.58,121.5358,12/01/2026,app
+Tara Kelly,uk,GBP,Pound Sterling,EUR,4355.82,86.7185,Jan 12 2026,app
+Nadia Haddad,SG,AUD,Australian Dollar,CAD,6840.42,152.4781,2026-01-12,branch
+Tara Kelly,DE,GBP,Pound Sterling,SGD,4076.06,133.8637,2026-01-12,Branch

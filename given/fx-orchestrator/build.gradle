@@ -1,0 +1,39 @@
+plugins {
+    id 'java'
+    id 'org.springframework.boot'        version '3.3.4'
+    id 'io.spring.dependency-management' version '1.1.6'
+}
+
+group       = 'com.fx'
+version     = '1.0.0'
+description = 'Upstream rate feed — pushes rate batches downstream and waits for an ACK'
+
+java {
+    toolchain { languageVersion = JavaLanguageVersion.of(21) }
+}
+
+repositories { mavenCentral() }
+
+dependencies {
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.springframework.boot:spring-boot-starter-jdbc'
+    // This service owns its own schema, in its own database. Same tool as fx-app-spring.
+    implementation 'org.liquibase:liquibase-core'
+    runtimeOnly    'com.mysql:mysql-connector-j'
+}
+
+// See fx-app-spring/build.gradle: keep bootJar the only artifact in build/libs.
+tasks.named('jar') { enabled = false }
+
+// Gradle prints nothing per test, so a run that passed and a run that was skipped look the same
+// on the console. Print the counts — a silently skipped integration test is exactly the trap this
+// project warns about, and you cannot spot it in a build that only says BUILD SUCCESSFUL.
+tasks.withType(Test).configureEach {
+    useJUnitPlatform()
+    afterSuite { desc, result ->
+        if (!desc.parent) {
+            println "${name}: ${result.testCount} tests, ${result.successfulTestCount} passed, " +
+                    "${result.failedTestCount} failed, ${result.skippedTestCount} skipped"
+        }
+    }
+}

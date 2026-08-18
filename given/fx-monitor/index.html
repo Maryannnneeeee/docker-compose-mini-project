@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>fx-monitor — live rates</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header>
+    <div class="brand">
+      <span class="dot" id="health-dot"></span>
+      <h1>fx-monitor</h1>
+      <span class="sub">live view of <code>fx-app-spring</code></span>
+    </div>
+
+    <div class="controls">
+      <div class="toggle-wrap">
+        <span class="toggle-label">ACCEPTING</span>
+        <button id="toggle" class="toggle" disabled aria-pressed="false">
+          <span class="knob"></span>
+        </button>
+        <span id="toggle-state" class="toggle-state">…</span>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <div id="banner" class="banner hidden"></div>
+
+    <section class="panel">
+      <div class="panel-head">
+        <h2>Latest rate per pair</h2>
+        <span id="updated" class="updated">waiting for first poll…</span>
+      </div>
+
+      <table id="rates">
+        <thead>
+          <tr>
+            <th>Pair</th>
+            <th class="num">Rate</th>
+            <th class="num">Last change</th>
+            <th class="spark">Trend</th>
+            <th class="when">As of</th>
+          </tr>
+        </thead>
+        <tbody id="rates-body">
+          <tr class="empty"><td colspan="5">No data yet.</td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section class="panel meta">
+      <h2>Feed</h2>
+      <dl>
+        <div><dt>Updates received</dt><dd id="update-count">0</dd></div>
+        <div><dt>Feed interval</dt><dd id="interval">—</dd></div>
+        <div><dt>Last update</dt><dd id="since">—</dd></div>
+        <div><dt>API</dt><dd id="api-state">checking…</dd></div>
+      </dl>
+      <p class="hint">
+        This page is served by nginx, which proxies <code>/api</code> and <code>/health</code>
+        to <code>fx-app-spring</code> inside the compose network — so the browser only ever
+        talks to one origin. The trend line holds the last ~90 seconds this page has seen;
+        it starts empty on reload, because the history lives in the browser, not the database.
+        <br><br>
+        <strong>Feed interval</strong> is the gap between the last two batches that actually
+        landed, taken from the server's own <code>captured_at</code> — so it reads about
+        <strong>2s</strong> while ACCEPTING is ON. Switch ACCEPTING <strong>OFF</strong> and
+        nothing is stored at all, so updates stop dead: <strong>Last update</strong> climbs and
+        goes amber, and the interval simply holds its last value. The orchestrator is still
+        calling every 10s — you can see that in <code>docker compose logs -f fx-orchestrator</code>,
+        not here, because a declined batch leaves no trace in the data.
+        This page polls once a second regardless, and most of those polls find nothing new —
+        which is why the poll count is not the interesting number
+        (<span id="poll-count">0</span> so far).
+      </p>
+    </section>
+  </main>
+
+  <script src="app.js"></script>
+</body>
+</html>
