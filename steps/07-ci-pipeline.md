@@ -33,21 +33,23 @@ out the merge button until `build` is green.
 
 ### Step-by-step
 
-**0. Branch first.** Clean `main`, new branch:
+**0. Branch first.** Clean `main`, new branch — stay at the root of your fork for this one, you're
+not going into `fx-exchange/`:
 
 ```bash
-cd fx-exchange
 git switch main && git pull
 git switch -c step-07
 ```
 
 **1. Create the workflow — and mind where it lives.** GitHub Actions only reads workflows from
-the **repo root**, never from a subfolder. But your Gradle build isn't at the root — it's in
-`fx-app-spring/`, and there is a second one in `fx-orchestrator/`. So the file goes at the root
-and *tells every step* which app to run in:
+the **repo root**, never from a subfolder. Your Gradle build isn't at the root of your fork — it's
+nested two levels down, in `fx-exchange/fx-app-spring/`, and there is a second one in
+`fx-exchange/fx-orchestrator/`. So the file goes at the true root of your fork — beside
+`README.md` and `fx-exchange/` itself, **not** inside it — and *tells every step* which app to
+run in:
 
-Create `.github/workflows/ci.yml` at the root of `fx-exchange` (beside `docker-compose.yml`,
-**not** inside `fx-app-spring/`):
+Create `.github/workflows/ci.yml` at the root of your fork (beside `fx-exchange/`, **not** inside
+it, and **not** inside `fx-app-spring/`):
 
 ```yaml
 name: CI
@@ -67,20 +69,20 @@ jobs:
           java-version: '21'
       - uses: gradle/actions/setup-gradle@v4
         with:
-          build-root-directory: fx-app-spring   # where the build lives, not the repo root
+          build-root-directory: fx-exchange/fx-app-spring   # where the build lives, not the repo root
       - name: Build and test (unit + slice + Testcontainers IT)
         run: ./gradlew build
-        working-directory: fx-app-spring
+        working-directory: fx-exchange/fx-app-spring
 ```
 
 Two lines carry the whole workspace nuance:
 
-- `working-directory: fx-app-spring` — so `./gradlew` runs where `build.gradle` and the wrapper
-  are. Leave it out and the step fails with "no such file or directory: ./gradlew", because the
-  root has none.
-- `build-root-directory: fx-app-spring` — `setup-gradle` caches Gradle's dependency cache and
-  build cache between runs, and it needs to know which build to key on. Point it at the root
-  (there is no build file there) and caching silently does nothing.
+- `working-directory: fx-exchange/fx-app-spring` — so `./gradlew` runs where `build.gradle` and
+  the wrapper are. Leave it out (or leave off the `fx-exchange/` prefix) and the step fails with
+  "no such file or directory: ./gradlew", because the root has none.
+- `build-root-directory: fx-exchange/fx-app-spring` — `setup-gradle` caches Gradle's dependency
+  cache and build cache between runs, and it needs to know which build to key on. Point it at the
+  root (there is no build file there) and caching silently does nothing.
 
 And note the verb: `build`, not `test`. That one word is what makes CI run **all three
 altitudes** — `build` runs `check`, and in Step 6 you hung `integrationTest` off `check`.
@@ -127,10 +129,10 @@ jobs:
           java-version: '21'
       - uses: gradle/actions/setup-gradle@v4
         with:
-          build-root-directory: ${{ matrix.app }}
+          build-root-directory: fx-exchange/${{ matrix.app }}
       - name: Build and test
         run: ./gradlew build
-        working-directory: ${{ matrix.app }}
+        working-directory: fx-exchange/${{ matrix.app }}
 ```
 
 Push. Refresh Actions and you'll see **two boxes side by side** — `build (fx-app-spring)` and
@@ -186,12 +188,13 @@ git pull
 <details>
 <summary>Stuck?</summary>
 
-**"./gradlew: no such file or directory".** The step is running at the repo root. Add
-`working-directory:` to the `run:` step, or the workflow file is inside `fx-app-spring/` instead
-of at the root — it must be at `fx-exchange/.github/workflows/`.
+**"./gradlew: no such file or directory".** The step is running at the repo root without the
+`fx-exchange/` prefix. Add (or fix) `working-directory:` on the `run:` step, and check the
+workflow file itself: it must be at the root of your fork — beside `fx-exchange/`, not inside it,
+and not inside `fx-app-spring/`.
 
 **"Permission denied" on `./gradlew`.** The wrapper script lost its executable bit in git. Fix it
-with `git update-index --chmod=+x fx-app-spring/gradlew` and commit.
+with `git update-index --chmod=+x fx-exchange/fx-app-spring/gradlew` and commit.
 
 **The cache never hits.** `build-root-directory` is missing or points at the repo root, where
 there is no build file.

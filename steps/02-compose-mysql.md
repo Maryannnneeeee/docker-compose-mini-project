@@ -31,6 +31,7 @@ command on a machine with no MySQL installed.
 > at the end. Start on a clean `main`:
 >
 > ```bash
+> cd fx-exchange
 > git switch main && git pull
 > git switch -c step-02
 > ```

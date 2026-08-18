@@ -45,7 +45,7 @@ MySQL for the integration test.
 
 **0. Back to your own repo, then branch.**
 
-Everything happens in the `fx-exchange` repo you have grown since Step 1 — the same one,
+Everything happens in the `fx-exchange` workspace you have grown since Step 1 — the same one,
 not a fresh one. Get onto a clean, known-good `main` and cut the branch:
 
 ```bash

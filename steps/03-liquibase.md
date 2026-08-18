@@ -43,6 +43,7 @@ from compose, and a stack that rebuilds its own database from nothing on every `
 > at the end. Start on a clean `main`:
 >
 > ```bash
+> cd fx-exchange
 > git switch main && git pull
 > git switch -c step-03
 > ```

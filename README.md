@@ -40,22 +40,36 @@ mini-project/
 own. Use them as a parachute if a step goes wrong: copy the previous step's folder over your work
 and carry on rather than losing an hour to a bad merge.
 
+Once you've done the "Getting started" step below, `fx-exchange/` appears here too, as a new
+sibling of `start/`, `given/`, `steps/` and `decks/` — that folder is your workspace, and
+everything you build lives inside it.
+
 ## Getting started
 
-You need Docker Desktop, a JDK 21, and a GitHub account. You do **not** need Gradle or MySQL
-installed — the Gradle wrapper and the containers handle both.
+You need a GitHub account. **Fork this repository** into your own account, then open your fork —
+either in a **GitHub Codespace** (Code → Codespaces → Create codespace on main) or cloned locally.
+Either way, you already have git initialized, `origin` pointing at your fork, and `main` holding
+everything you're reading right now.
+
+A Codespace already has Docker and a JDK on it — confirm with `docker --version` and
+`java -version` before you start. Working locally instead, you need Docker Desktop and a JDK 21 of
+your own. Either way you do **not** need Gradle or MySQL installed — the Gradle wrapper and the
+containers handle both.
+
+From the root of your fork, make the workspace you'll build everything in:
 
 ```bash
-mkdir fx-exchange && cd fx-exchange
-git init -b main
-cp -R ../mini-project/start/. .
+mkdir fx-exchange
+cp -R start/fx-app-spring fx-exchange/
+cp start/README.md fx-exchange/README.md
+cd fx-exchange
 ```
 
 Then open [steps/01-dockerfile.md](steps/01-dockerfile.md).
 
-Work on a branch per step (`step-01`, `step-02`, …) and merge each one to `main` through a pull
-request. It costs nothing while you are alone in the repo and is the only habit that scales once
-you are not — and from step 7 onwards the pipeline depends on it.
+Work on a branch per step (`step-01`, `step-02`, …) and merge each one to your fork's `main`
+through a pull request. It costs nothing while you are alone in the repo and is the only habit
+that scales once you are not — and from step 7 onwards the pipeline depends on it.
 
 ## What you are building
 

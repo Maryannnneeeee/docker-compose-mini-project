@@ -31,6 +31,7 @@ page at `http://localhost:3000` showing your rates.
 > at the end. Start on a clean `main`:
 >
 > ```bash
+> cd fx-exchange
 > git switch main && git pull
 > git switch -c step-04
 > ```

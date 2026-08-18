@@ -34,10 +34,10 @@ visibly pauses at the gate until you approve it.
 
 ### Step-by-step
 
-**0. Branch first.**
+**0. Branch first.** Same as Step 7 — stay at the root of your fork, you're editing
+`.github/workflows/`, not anything inside `fx-exchange/`:
 
 ```bash
-cd fx-exchange
 git switch main && git pull
 git switch -c step-09
 ```
@@ -72,7 +72,7 @@ build only, nothing is pushed:
       - uses: actions/checkout@v4
       - name: Build image
         run: docker build -t ${{ matrix.app }}:ci .
-        working-directory: ${{ matrix.app }}
+        working-directory: fx-exchange/${{ matrix.app }}
 ```
 
 Three entries again, because `fx-monitor` ships an image without having a Gradle build. Note what
@@ -113,10 +113,10 @@ jobs:
           java-version: '21'
       - uses: gradle/actions/setup-gradle@v4
         with:
-          build-root-directory: ${{ matrix.app }}
+          build-root-directory: fx-exchange/${{ matrix.app }}
       - name: Build and test
         run: ./gradlew build
-        working-directory: ${{ matrix.app }}
+        working-directory: fx-exchange/${{ matrix.app }}
 ```
 
 **4. Job 2 — `publish`.** `needs: build`, so a red build never reaches it. Log in to GHCR with
@@ -140,7 +140,7 @@ ship.
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
       - name: Build and push
-        working-directory: ${{ matrix.app }}
+        working-directory: fx-exchange/${{ matrix.app }}
         run: |
           # GHCR rejects an owner segment containing uppercase characters with
           # "400 invalid reference format", so lowercase it rather than trusting the org name.

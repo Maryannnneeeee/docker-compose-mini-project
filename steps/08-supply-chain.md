@@ -76,19 +76,27 @@ button.)
 
 **5. Commit the Dependabot config.** The switch in step 4 turns on *alerts*. A committed
 `.github/dependabot.yml` is what tells Dependabot where your builds actually are — and with two
-Gradle apps in subfolders, it will find nothing without it. Create it at the repo root:
+Gradle apps in subfolders, it will find nothing without it. Like `ci.yml` in the last step, this
+one lives at the **true root of your fork**, not inside `fx-exchange/`. Step back out of the
+workspace:
+
+```bash
+cd ../..
+```
+
+Then create `.github/dependabot.yml` there:
 
 ```yaml
 version: 2
 updates:
   - package-ecosystem: gradle
-    directory: /fx-app-spring
+    directory: /fx-exchange/fx-app-spring
     schedule:
       interval: weekly
     open-pull-requests-limit: 5
 
   - package-ecosystem: gradle
-    directory: /fx-orchestrator
+    directory: /fx-exchange/fx-orchestrator
     schedule:
       interval: weekly
     open-pull-requests-limit: 5
@@ -100,15 +108,15 @@ updates:
       interval: weekly
 
   - package-ecosystem: docker
-    directory: /fx-app-spring
+    directory: /fx-exchange/fx-app-spring
     schedule:
       interval: weekly
   - package-ecosystem: docker
-    directory: /fx-orchestrator
+    directory: /fx-exchange/fx-orchestrator
     schedule:
       interval: weekly
   - package-ecosystem: docker
-    directory: /fx-monitor
+    directory: /fx-exchange/fx-monitor
     schedule:
       interval: weekly
 ```
@@ -116,6 +124,12 @@ updates:
 Note what it covers beyond your Java dependencies: the **actions** your workflows pin and the
 **base images** your Dockerfiles pull. `FROM eclipse-temurin:21-jre` is a supply-chain dependency
 exactly like `liquibase-core` is, and it is the one people forget.
+
+Back to `fx-app-spring/` for the rest of this step:
+
+```bash
+cd fx-exchange/fx-app-spring
+```
 
 > **Why no vulnerability scanner job?** The OWASP dependency-check plugin is the obvious
 > candidate, and since the NVD API rate-limit changes it needs an API key to be usable in CI —

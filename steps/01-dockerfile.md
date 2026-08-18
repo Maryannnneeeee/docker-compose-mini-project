@@ -20,8 +20,8 @@ feed — comes up with one command on a laptop that has none of those things ins
 
 ### What you're producing
 
-A **new repository** laid out as a workspace, with `fx-app-spring/` inside it, a `Dockerfile` at
-that project's root, and an image you can run without a JDK or Gradle anywhere in sight.
+A `fx-exchange/` **workspace folder** in your fork, with `fx-app-spring/` inside it, a `Dockerfile`
+at that project's root, and an image you can run without a JDK or Gradle anywhere in sight.
 
 ---
 
@@ -30,46 +30,41 @@ that project's root, and an image you can run without a JDK or Gradle anywhere i
 > **You do not need MySQL for this task.** Stop it if it's running — this step is about packaging,
 > and the database joins the stack in Step 2. Everything below is checked without one.
 
-**0. First order of business: your own repository.**
+**0. First order of business: your own workspace.**
 
 You are not adding to one project — you are assembling a **system** of three, which by
 the end will be your API, a web front end and an upstream feed, all running together. Three
 applications means three folders, side by side. None of them lives inside another.
 
-**Every student does this in their own repository.** Create a new, empty one called
-`fx-exchange` on GitHub — no README, no `.gitignore`, nothing; you are about to push those
-yourself. Then:
+**Every student works in their own fork.** If you haven't already, fork this repository on
+GitHub into your own account, then open it — in a Codespace, or cloned locally. You already have
+git, a remote called `origin` pointing at your fork, and a `main` branch holding this course's
+`README.md`, `given/`, `start/` and `steps/`. You are not creating a repository here — you are
+adding a folder to the one you already have.
+
+From the root of your fork:
 
 ```bash
-mkdir fx-exchange && cd fx-exchange
-git init -b main
-cp -R ../start/fx-app-spring .
+mkdir fx-exchange
+cp -R start/fx-app-spring fx-exchange/
+cp start/README.md fx-exchange/README.md
+cd fx-exchange
 ```
 
-Write a `README.md` at the root **with your name in it**. This is your repo, and for the rest of
-the week your name on it is how anyone knows whose stack they are looking at:
-
-```markdown
-# FX exchange
-
-**Name:** Your Name Here
-
-| Folder | What it is | Built by |
-|---|---|---|
-| `fx-app-spring/` | the API and its database | me |
-```
+Open the `README.md` you just copied in and put your **name in it** — it already has a
+`**Name:**` line waiting. This is your workspace, and for the rest of the week your name on it is
+how anyone knows whose stack they are looking at.
 
 Commit and push that starting point to `main` **before you change anything**:
 
 ```bash
-git add .
+git add fx-exchange
 git commit -m "chore: fx-app-spring and README"
-git remote add origin git@github.com:<your-username>/fx-exchange.git
-git push -u origin main
+git push
 ```
 
-Check GitHub: `main` holds `fx-app-spring/` and your README, and nothing else. That is your
-baseline — the known-good state you can always come back to.
+Check GitHub: `main` on your fork now also holds `fx-exchange/`, with `fx-app-spring/` and your
+README inside it. That is your baseline — the known-good state you can always come back to.
 
 **Now branch.** Everything you build rides a branch and lands on `main` through a pull
 request, one branch per exercise:
@@ -85,16 +80,19 @@ git switch -c step-01
 Where you are heading, so the shape makes sense from the start:
 
 ```
-fx-exchange/                 ← your repo root
-├── README.md
-├── docker-compose.yml       ← Step 2 puts this here
-├── fx-app-spring/           ← your API. Its Dockerfile goes at ITS root.
-├── fx-monitor/              ← Step 4 adds this, beside — not inside
-└── fx-orchestrator/         ← Step 5 adds this, also beside
+your-fork/                     ← repo root — given/, start/, steps/, decks/ live here, untouched
+└── fx-exchange/                ← your workspace — everything below lives here
+    ├── README.md
+    ├── docker-compose.yml       ← Step 2 puts this here
+    ├── fx-app-spring/           ← your API. Its Dockerfile goes at ITS root.
+    ├── fx-monitor/              ← Step 4 adds this, beside — not inside
+    └── fx-orchestrator/         ← Step 5 adds this, also beside
 ```
 
-> `fx-app-spring/` is the application as it stands — nothing is lost by starting a
-> fresh repo. Everything below happens **inside that folder** unless a step says otherwise.
+> `fx-app-spring/` is the application as it stands — nothing is lost by working in a fresh
+> workspace folder. Everything below happens **inside `fx-exchange/`** unless a step says
+> otherwise — and from Step 7 on, a couple of things happen one level up, at the root of your
+> fork. Those steps will tell you when.
 
 **1. Build the jar the old way, once, so you know what goes in the box.**
 
