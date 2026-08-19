@@ -1,0 +1,48 @@
+name: fx-stack
+
+services:
+  fx-db:
+    image: mysql:8
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpass
+      MYSQL_DATABASE: fxdb
+      MYSQL_USER: appuser
+      MYSQL_PASSWORD: apppass
+    ports:
+      - "${DB_PORT:-3307}:3306"
+    volumes:
+      - fx-db-data:/var/lib/mysql
+      - ./fx-app-spring/ops/fxdb-seed.sql:/docker-entrypoint-initdb.d/01-seed.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "mysqladmin ping -h 127.0.0.1 -u$${MYSQL_USER} -p$${MYSQL_PASSWORD}"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+      start_period: 20s
+
+  fx-app-spring:
+    build: ./fx-app-spring
+    image: fx-app-spring:1.0
+    restart: on-failure
+    ports:
+      - "${API_PORT:-8080}:8080"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://fx-db:3306/fxdb
+      SPRING_DATASOURCE_USERNAME: appuser
+      SPRING_DATASOURCE_PASSWORD: apppass
+    depends_on:
+      fx-db:
+        condition: service_healthy
+
+  fx-monitor:
+    build: ./fx-monitor
+    image: fx-monitor:1.0
+    ports:
+      - "${MONITOR_PORT:-3000}:80"
+    environment:
+      API_HOST: fx-app-spring
+    depends_on:
+      - fx-app-spring
+
+volumes:
+  fx-db-data:

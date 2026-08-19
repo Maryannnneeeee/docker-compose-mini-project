@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>FX exchange · Steps 1–5 — Docker, Compose &amp; the full stack</title>
+<title>FX exchange · Steps 1–5 — Docker, Compose, CI &amp; CD</title>
 <style>
   :root{--bg:#0f1420;--panel:#182234;--panel2:#1f2c42;--ink:#e8edf5;--muted:#9fb0c7;
         --mint:#4bd6a0;--blue:#5aa2ff;--amber:#e6a15a;--red:#ff6b6b;--border:#2a3852}
@@ -64,15 +64,16 @@
 
 <header class="hero"><div class="wrap">
   <div class="crumb">FX exchange · Steps 1–5</div>
-  <h1>Ship the machine: Docker, Compose, Liquibase &amp; a live full stack</h1>
+  <h1>Ship the machine: Docker, Compose, CI &amp; CD</h1>
   <p class="goal">
     Your API works — on your laptop, with your JDK, your Gradle and your hand-installed MySQL.
-    Here all of that goes in a box that anyone can run. <em>Done looks like:</em> five containers,
-    two databases and a browser page where a toggle visibly changes the behaviour of a service two
-    hops away — all raised by one <code>docker compose up</code> on a machine with nothing installed.
+    Here all of that goes in a box that anyone can run, and a pipeline takes over the checking.
+    <em>Done looks like:</em> three containers, one database, and a browser page that renders your
+    rates — all raised by one <code>docker compose up</code> on a machine with nothing installed —
+    plus two images on a registry that only reach it once a human says yes.
   </p>
   <div class="daynav">
-    <span class="here">Steps 1–5 · Containers, Compose, Liquibase</span><span><a href="overview-steps-06-09.html">Steps 6–9 · Tests, CI &amp; CD</a></span>
+    <span class="here">Steps 1–5 · Containers, Compose, CI &amp; CD</span>
   </div>
 </div></header>
 
@@ -80,9 +81,8 @@
 
 <div class="warn" style="border-color:var(--blue);background:rgba(90,162,255,.1);color:#cfe3ff">
   <strong>New here, or lost between tasks?</strong>
-  <a href="diagrams/">Twelve diagrams</a> — the system after every step, the feed loop as a
-  sequence, and a screenshot of the finished thing. Same content as a
-  <a href="architecture-steps-01-05.html">click-through deck</a>.
+  <a href="diagrams/">Eight diagrams</a> — the system after every step, and a screenshot of the
+  finished thing. Same content as a <a href="architecture-steps-01-05.html">click-through deck</a>.
 </div>
 
 <h2>By the end of Step 5 you can…</h2>
@@ -92,10 +92,10 @@
   <li>🔌 Explain <em>whose</em> <code>localhost</code> a container is talking to</li>
   <li>🗂️ Raise an app + database together with one command</li>
   <li>💾 Say what <code>down</code> keeps and <code>down -v</code> destroys, and why</li>
-  <li>🧬 Version a schema as code, and rebuild a database from nothing</li>
-  <li>🔧 Recognise a checksum failure, a failed migration and a stuck changelog lock</li>
   <li>🚪 Diagnose "port is already allocated" in one glance</li>
-  <li>🛰️ Implement someone else's integration contract, in both directions</li>
+  <li>🌐 Serve a browser app from nginx and proxy its API calls through one origin</li>
+  <li>🚦 Gate <code>main</code> behind CI so a red suite never merges</li>
+  <li>📦 Publish two images to <code>ghcr.io</code> and gate the deploy behind a human</li>
 </ul>
 
 <h2>Before you start</h2>
@@ -118,7 +118,7 @@ git switch -c step-01                # then one branch per step</code></pre>
   keeps a team from standing on each other later.
 </p>
 <p style="color:var(--muted);font-size:14px;margin:10px 0 0">
-  Three applications, <strong>side by side</strong> — none inside another. Each owns its own
+  Two applications, <strong>side by side</strong> — neither inside the other. Each owns its own
   <code>Dockerfile</code> at the root of its own folder; <code>docker-compose.yml</code> sits at
   the workspace root and wires them together. Add a <code>README.md</code> there with
   <strong>your name</strong> on it.
@@ -126,9 +126,16 @@ git switch -c step-01                # then one branch per step</code></pre>
 <pre><code>fx-exchange/
 ├── README.md
 ├── docker-compose.yml       ← Step 2
-├── fx-app-spring/           ← the API (Dockerfile at ITS root)
-├── fx-monitor/              ← Step 4 — beside, not inside
-└── fx-orchestrator/         ← Step 5 — also beside</code></pre>
+├── fx-app-spring/           ← your API. Its Dockerfile goes at ITS root.
+└── fx-monitor/              ← Step 3 — beside, not inside</code></pre>
+<p style="color:var(--muted);font-size:14px;margin:10px 0 0">
+  <strong>From Step 4 on, the pipeline files move up a level.</strong>
+  <code>.github/workflows/ci.yml</code> and <code>cd.yml</code> live at the <strong>true root of
+  your fork</strong> — beside <code>fx-exchange/</code>, not inside it — because GitHub Actions
+  only reads workflows from the repo root. Every step inside them then names
+  <code>working-directory: fx-exchange/fx-app-spring</code> explicitly, because the Gradle build
+  lives two levels down from there.
+</p>
 </div>
 <div class="warn">
   <strong>Docker Desktop must be running.</strong> If it won't install on your laptop, say so at
@@ -145,7 +152,7 @@ git switch -c step-01                # then one branch per step</code></pre>
   <div class="meta">AM · ~65 min · deck: Containerisation / Dockerfiles</div>
   <p class="why">Why: "works on my machine" is a bug report, not a status.</p>
   <p><strong>Start a new repo, and no database needed — stop MySQL for this one.</strong>
-     Lay the workspace out first (three siblings, README with your name), then write the
+     Lay the workspace out first (two sibling apps, README with your name), then write the
      Dockerfile in stages
      and run it after each: naive single-stage → publish a port → diagnose the
      <em>whose localhost?</em> failure (and deliberately <em>not</em> fix it) → multi-stage →
@@ -181,23 +188,7 @@ git switch -c step-01                # then one branch per step</code></pre>
 
 <div class="task" id="t3">
   <label class="chk"><input type="checkbox" data-k="step3"> mark done</label>
-  <h3><a href="../steps/03-liquibase.md">3 · Liquibase owns the schema</a></h3>
-  <div class="meta">PM · ~70 min · deck: Data migrations (gap-fill)</div>
-  <p class="why">Why: the shape of your database is the last thing you own that isn't code.</p>
-  <p>Change sets in YAML, seed data as <code>sqlFile</code>, the init-script mount
-     <strong>deleted</strong>, and <code>DATABASECHANGELOG</code> read as the ledger it is. Then
-     break it three ways on purpose — an edited applied change set, bad DDL, and a stuck
-     <code>DATABASECHANGELOGLOCK</code> — and fix each.</p>
-  <details class="hint"><summary>Stuck?</summary>
-    Never edit a change set that has already run. The fix is always a <em>new</em> one.
-    <code>clearCheckSums</code> means "trust the files, forget what actually ran".</details>
-  <div class="cp"><b>Checkpoint:</b> with <b>no seed file mounted</b>,
-    <code>down -v &amp;&amp; up</code> rebuilds schema + data: 8/20/30/200 rows, EUR/USD <b>1.0818</b>.</div>
-</div>
-
-<div class="task" id="t4">
-  <label class="chk"><input type="checkbox" data-k="step4"> mark done</label>
-  <h3><a href="../steps/04-monitor-and-ports.md">4 · A second app, and the port fight</a></h3>
+  <h3><a href="../steps/03-monitor-and-ports.md">3 · A second app, and the port fight</a></h3>
   <div class="meta">PM · ~45 min · deck: Containerisation</div>
   <p class="why">Why: most containers you'll ever run were built by someone else.</p>
   <p><code>fx-monitor</code> is given complete — containerise it, add it to the stack, hit
@@ -208,32 +199,57 @@ git switch -c step-01                # then one branch per step</code></pre>
     Container ports are private to each container; published host ports are shared across your
     whole machine. It is always the left-hand number.</details>
   <div class="cp"><b>Checkpoint:</b> three services up · <code>http://localhost:3000</code> renders
-    the live table · the toggle is greyed out with a 404 banner (correct — that's Step 5).</div>
+    the live table · the ACCEPTING toggle reads ON and rates tick every couple of seconds —
+    <code>fx-app-spring</code> feeds itself, no second app required.</div>
+</div>
+
+<div class="task" id="t4">
+  <label class="chk"><input type="checkbox" data-k="step4"> mark done</label>
+  <h3><a href="../steps/04-ci-pipeline.md">4 · The machine runs the tests (CI)</a></h3>
+  <div class="meta">AM/PM · ~45 min · deck: CI / GitHub Actions</div>
+  <p class="why">Why: a test only protects you if it runs without you remembering to run it.</p>
+  <p>Author <code>.github/workflows/ci.yml</code> at the <strong>repo root</strong>
+     (<code>working-directory: fx-exchange/fx-app-spring</code>), triggered on <code>push</code>
+     and <code>pull_request</code>, running <code>./gradlew build</code> against your
+     <strong>existing</strong> test suite — nothing new to write here. Then rig a PR with a
+     deliberately failing assertion, watch CI go red, and turn on <strong>branch protection</strong>
+     so red can't merge.</p>
+  <details class="hint"><summary>Stuck?</summary>
+    "Required status checks" in branch protection is what turns a red X from a suggestion into a
+    locked merge button. No protection rule → nothing is actually enforced.</details>
+  <div class="cp"><b>Checkpoint:</b> your Actions tab shows a <b>red run followed by a green
+    run</b>; the rigged red PR is <b>blocked</b> by branch protection — the merge button won't go.</div>
 </div>
 
 <div class="task" id="t5">
   <label class="chk"><input type="checkbox" data-k="step5"> mark done</label>
-  <h3><a href="../steps/05-orchestrator-feed.md">5 · The orchestrator loop</a></h3>
-  <div class="meta">PM · ~80 min · deck: Containerisation + REST</div>
-  <p class="why">Why: a service you don't control is now depending on your answer.</p>
-  <p><code>fx-orchestrator</code> pushes a batch of rates every two seconds and waits for your
-     ACK. Build the inbound endpoint (202), store the ticks, call <strong>out</strong> over
-     <code>RestTemplate</code> with ACCEPTED or DECLINED, and add the toggle that decides which.
-     Evolve <code>fx_rate</code> forward with a new change set — Step 3's rule, in production form.</p>
+  <h3><a href="../steps/05-cd-ghcr.md">5 · From green build to blessed deploy (CD)</a></h3>
+  <div class="meta">PM · ~45 min · deck: CI→CD</div>
+  <p class="why">Why: shipping should be one click a human takes on purpose — not a thing that happens by accident.</p>
+  <p>Split the pipeline by trigger so nothing builds twice: <strong>narrow <code>ci.yml</code> to
+     <code>pull_request</code></strong> and add a build-only <code>images</code> matrix, then add
+     <code>cd.yml</code> on <code>push: [main]</code>. Its jobs chain: <strong>build</strong>
+     (verify) → <strong>publish</strong> (log in to <code>ghcr.io</code>, build, push
+     <code>sha-&lt;short&gt;</code> <em>and</em> <code>latest</code> for both
+     <code>fx-app-spring</code> and <code>fx-monitor</code>) → <strong>deploy</strong>
+     (<code>environment: staging</code>, a required-reviewer gate; the deploy itself is a stand-in
+     <code>echo</code> for now).</p>
   <details class="hint"><summary>Stuck?</summary>
-    Read the orchestrator's log first — it names the exact URL, the exact JSON, and what it thinks
-    you got wrong.</details>
-  <div class="cp"><b>Checkpoint:</b> toggle <b>ON</b> → values move, batches every <b>2s</b>,
-    <code>fx_rate</code> grows · <b>OFF</b> → frozen, DECLINED, <b>10s</b> ·
-    <code>/api/rates</code> still returns exactly <b>10</b> rows either way.</div>
+    ghcr package names must be <b>lowercase</b>. If <code>github.repository_owner</code> has
+    capitals, the push 400s — lowercase it in the workflow.</details>
+  <div class="cp"><b>Checkpoint:</b> a merge to <code>main</code> runs <code>cd.yml</code>;
+    <code>fx-app-spring</code> and <code>fx-monitor</code> both show up on ghcr with <b>two
+    tags</b> — <code>sha-&lt;short&gt;</code> and <code>latest</code>; the <code>deploy</code> job
+    <b>waits for a reviewer</b> before it runs.</div>
 </div>
 
 <div class="genai">
-  <h3 style="margin:0 0 4px"><a href="../steps/06-test-tiers.md">GenAI closer — build the habit that saves you</a></h3>
+  <h3 style="margin:0 0 4px"><a href="../steps/05-cd-ghcr.md">GenAI closer — build the habit that saves you</a></h3>
   <div class="meta">~10 min</div>
-  <p>Have an assistant review your <code>Dockerfile</code>, then price every suggestion before
-     taking one. Then ask it the startup-race question you already know the answer to, and see
-     whether it reaches for a <code>sleep</code>.</p>
+  <p>Have an assistant review your <code>Dockerfile</code>, then your <code>ci.yml</code> and
+     <code>cd.yml</code> — and price every suggestion before taking one. Then ask it to "speed up
+     CI", and see whether it reaches for a <code>sleep</code> in the port-fight step, or for
+     dropping a test in the pipeline step, to get there faster.</p>
 </div>
 
 <h2>Theory background</h2>
@@ -271,12 +287,20 @@ git switch -c step-01                # then one branch per step</code></pre>
 </div>
 
 <div class="theory">
-  <h4>Migrations: the schema is code too</h4>
-  <p>Liquibase keeps an ordered list of change sets and records in the database itself which ones
-     it has run. Empty database → whole schema. Current database → nothing. Three behind → three
-     applied. The one rule: <strong>never edit a change set that has already run.</strong> It was
-     hashed when it ran; change the file and the hashes disagree, and Liquibase stops rather than
-     guess.</p>
+  <h4>CI is a gate, not a chore</h4>
+  <p>A pipeline that runs the suite on every push tells you when something broke.
+     <strong>Branch protection</strong> — a required status check — is what turns that from
+     information into enforcement: a red run doesn't just warn you, it <em>locks the merge
+     button</em>. Green stops being an opinion and becomes a precondition.</p>
+</div>
+
+<div class="theory">
+  <h4>CD ships; a human blesses</h4>
+  <p>The CD pipeline builds the image, tags it <code>sha-&lt;short&gt;</code> so every deploy is
+     traceable to an exact commit, and pushes it to the registry — all automatic. The
+     <code>deploy</code> job then sits behind <code>environment: staging</code> with a required
+     reviewer. Automation carries the change to the door; a person decides to open it. That gate is
+     the difference between automation and abdication.</p>
 </div>
 
 <h2>Cheatsheet</h2>
@@ -325,15 +349,14 @@ git switch -c step-01                # then one branch per step</code></pre>
 </div>
 
 <div class="sheet">
-<h4>Liquibase</h4>
+<h4>CI / CD — GitHub Actions</h4>
 <table>
-<tr><td><code>db.changelog-master.yaml</code></td><td>ordered table of contents</td></tr>
-<tr><td><code>changeSet: id + author</code></td><td>+ file path = its identity</td></tr>
-<tr><td><code>createTable / addColumn</code></td><td>schema, dialect-independent</td></tr>
-<tr><td><code>sqlFile / sql</code></td><td>raw SQL when that's clearer</td></tr>
-<tr><td><code>DATABASECHANGELOG</code></td><td>what has run, in order, hashed</td></tr>
-<tr><td><code>DATABASECHANGELOGLOCK</code></td><td>stuck here → "Waiting for lock…"</td></tr>
-<tr><td>checksum error</td><td>you edited an applied change set</td></tr>
+<tr><td><code>ci.yml</code></td><td>Step 4: <code>push</code> + <code>pull_request</code> → <code>build</code>. Step 5: narrowed to <code>pull_request</code>, plus an <code>images</code> matrix</td></tr>
+<tr><td><code>cd.yml</code></td><td>on <code>push: [main]</code> → <code>build</code> → <code>publish</code> → <code>deploy</code></td></tr>
+<tr><td><code>working-directory: fx-exchange/fx-app-spring</code></td><td>where a <code>run:</code> step actually executes</td></tr>
+<tr><td><code>build-root-directory:</code></td><td>same path, for <code>setup-gradle</code>'s cache key</td></tr>
+<tr><td><code>ghcr.io/&lt;owner&gt;/&lt;app&gt;</code></td><td>tags <code>sha-&lt;short&gt;</code> + <code>latest</code> · owner <b>lowercase</b></td></tr>
+<tr><td><code>environment: staging</code></td><td>required-reviewer gate before <code>deploy</code> runs</td></tr>
 </table>
 </div>
 
@@ -356,30 +379,25 @@ git switch -c step-01                # then one branch per step</code></pre>
 </div>
 
 <div class="task xtra">
-  <h3>Roll one back</h3>
-  <p>Every change set you wrote has a <code>rollback:</code> block. Add the
-     <code>org.liquibase.gradle</code> plugin, roll back the last one, look at what happened to
-     <code>DATABASECHANGELOG</code>, and then
-     reapply it. When is rollback genuinely usable, and when is "roll forward" the only honest
-     option?</p>
+  <h3>Add a smoke-test job that curls the running container</h3>
+  <p>After <code>cd.yml</code> pushes the image, add a job that <code>docker run -d</code> that
+     exact image, waits for <code>/health</code>, curls <code>/api/rates</code> and asserts it got
+     <b>10</b>, then tears it down. A green build and a container that won't start are not
+     mutually exclusive — this catches the gap.</p>
 </div>
 
 <div class="task xtra">
-  <h3>Make the feed misbehave</h3>
-  <p><code>fx-orchestrator</code> reads <code>fx.delay.*</code> and <code>fx.ack.timeout</code>
-     from its environment. Set the ACK timeout below your own response time and watch it declare
-     NO_ACK for batches you <em>did</em> answer. That's a real distributed-systems failure —
-     the answer arrived, just too late to count.</p>
+  <h3>Add a CI status badge</h3>
+  <p>Drop a <code>![CI](.../actions/workflows/ci.yml/badge.svg)</code> badge into your
+     <code>fx-exchange/README.md</code>. It's one line of Markdown, and it's the first thing a
+     teammate — or a reviewer — checks before reading anything else.</p>
 </div>
 
 <footer>
   Entry point: <a href="../README.md">README.md</a> ·
   Diagrams: <a href="diagrams/">diagrams/</a> (or the <a href="architecture-steps-01-05.html">deck</a>) ·
-  Answers: <a href="../solutions/">solution/</a> (five runnable stacks, one per task) ·
+  Answers: <a href="../solutions/">solution/</a> (five runnable stacks, one per step) ·
   Start here: <a href="../README.md">the mini-project README</a>.
-  <br><br>
-  Next: the machines take over the checking — three altitudes of tests, CI on every push, and
-  a CD pipeline that ships the images you built here.
 </footer>
 
 </div>

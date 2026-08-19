@@ -1,5 +1,0 @@
-# The orchestrator versions its own schema, exactly the way fxdb is versioned.
-# Two services, two databases, two changelogs — neither reaches into the other.
-databaseChangeLog:
-  - include:
-      file: db/changelog/changes/001-create-feed-batch.yaml
