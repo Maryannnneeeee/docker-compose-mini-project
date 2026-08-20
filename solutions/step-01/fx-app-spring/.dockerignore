@@ -1,8 +1,0 @@
-build/
-.gradle/
-.git/
-.github/
-.idea/
-*.iml
-docs/
-README.md
