@@ -98,12 +98,14 @@
   <div class="kicker">FX exchange · Steps 1–5</div>
   <h1>The system,<br>one step at a time</h1>
   <p class="lede">You start with a jar and a laptop full of things you installed by hand. You finish
-  with five containers, two databases, and a browser page that changes a service two hops away.</p>
+  with three containers, one database, and a pipeline that ships two images to a registry behind a
+  human who has to say yes.</p>
   <div class="legend">
-    <span><span class="sw" style="background:rgba(90,162,255,.25);border:1.5px solid #5aa2ff"></span> a running container</span>
+    <span><span class="sw" style="background:rgba(90,162,255,.25);border:1.5px solid #5aa2ff"></span> a running container / pipeline job</span>
     <span><span class="sw" style="background:rgba(199,139,255,.22);border:1.5px solid #c78bff"></span> a database</span>
     <span><span class="sw" style="background:transparent;border:1.5px dashed #9fb0c7"></span> a boundary</span>
-    <span><span class="sw" style="background:rgba(75,214,160,.3);border:1.5px solid #4bd6a0"></span> published host port</span>
+    <span><span class="sw" style="background:rgba(75,214,160,.3);border:1.5px solid #4bd6a0"></span> published host port / a passed gate</span>
+    <span><span class="sw" style="background:transparent;border:1.5px dashed #e6a15a"></span> a gate you must pass</span>
     <span><span class="sw" style="background:rgba(255,107,107,.25);border:1.5px solid #ff6b6b"></span> broken / absent</span>
   </div>
   <p class="note">These are <b>C4 container diagrams</b>. In C4 a "container" means <i>a separately
@@ -135,7 +137,7 @@
   <g>
     <rect x="446" y="66" width="180" height="66" rx="10" fill="rgba(199,139,255,.18)" stroke="#c78bff" stroke-width="1.5"/>
     <text x="536" y="94" fill="#e8edf5" font-size="15" text-anchor="middle" font-weight="600">MySQL 8</text>
-    <text x="536" y="114" fill="#9fb0c7" font-size="12" text-anchor="middle">:3306 · seeded in W1</text>
+    <text x="536" y="114" fill="#9fb0c7" font-size="12" text-anchor="middle">:3306 · seeded by hand</text>
   </g>
   <g>
     <rect x="646" y="66" width="206" height="66" rx="10" fill="rgba(90,162,255,.18)" stroke="#5aa2ff" stroke-width="1.5"/>
@@ -237,48 +239,8 @@
 </section>
 
 <section class="slide ">
-  <div class="head"><div class="badge ">3</div><h2>Liquibase owns the schema</h2><div class="sub">branch <code>step-03</code> · ~70 min</div></div>
-  <div class="fig"><svg viewBox="0 0 900 320" role="img" aria-label="After step 3: Liquibase inside the app builds the schema, seed mount removed">
-  <defs><marker id="d" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto">
-    <path d="M0,0 L7,3 L0,6 z" fill="#9fb0c7"/></marker></defs>
-
-  <rect x="12" y="46" width="876" height="256" rx="14" fill="none" stroke="#5aa2ff" stroke-width="1.5" stroke-dasharray="7 6"/>
-  <text x="32" y="72" fill="#5aa2ff" font-size="13" letter-spacing="1.5">COMPOSE NETWORK — fx-stack</text>
-
-  <rect x="60" y="96" width="330" height="176" rx="11" fill="rgba(90,162,255,.2)" stroke="#5aa2ff" stroke-width="1.8"/>
-  <text x="225" y="124" fill="#e8edf5" font-size="16" text-anchor="middle" font-weight="700">fx-app-spring</text>
-  <rect x="88" y="140" width="274" height="64" rx="9" fill="rgba(75,214,160,.16)" stroke="#4bd6a0" stroke-width="1.5"/>
-  <text x="225" y="164" fill="#4bd6a0" font-size="13.5" text-anchor="middle" font-weight="600">db/changelog/</text>
-  <text x="225" y="186" fill="#9fb0c7" font-size="12" text-anchor="middle">8 change sets · shipped in the image</text>
-  <text x="225" y="228" fill="#9fb0c7" font-size="12.5" text-anchor="middle">runs on every startup,</text>
-  <text x="225" y="248" fill="#9fb0c7" font-size="12.5" text-anchor="middle">applies only what's missing</text>
-
-  <rect x="510" y="96" width="330" height="176" rx="11" fill="rgba(199,139,255,.2)" stroke="#c78bff" stroke-width="1.8"/>
-  <text x="675" y="124" fill="#e8edf5" font-size="16" text-anchor="middle" font-weight="700">fx-db</text>
-  <text x="675" y="146" fill="#9fb0c7" font-size="12.5" text-anchor="middle">starts EMPTY — no seed mount</text>
-  <rect x="538" y="162" width="274" height="46" rx="9" fill="rgba(159,176,199,.12)" stroke="#9fb0c7" stroke-width="1.3"/>
-  <text x="675" y="182" fill="#e8edf5" font-size="12.5" text-anchor="middle">DATABASECHANGELOG</text>
-  <text x="675" y="198" fill="#9fb0c7" font-size="11.5" text-anchor="middle">what ran, in order, hashed</text>
-  <text x="675" y="232" fill="#4bd6a0" font-size="12.5" text-anchor="middle">8 · 20 · 30 · 200 rows</text>
-  <text x="675" y="254" fill="#4bd6a0" font-size="12.5" text-anchor="middle">EUR/USD 1.0818</text>
-
-  <path d="M394,178 L506,178" stroke="#4bd6a0" stroke-width="2" marker-end="url(#d)"/>
-  <text x="450" y="168" fill="#4bd6a0" font-size="12.5" text-anchor="middle" font-weight="600">migrate</text>
-  <text x="450" y="196" fill="#9fb0c7" font-size="11.5" text-anchor="middle">at startup</text>
-
-  <text x="450" y="26" fill="#e6a15a" font-size="13" text-anchor="middle">the schema moved out of a file somebody remembers to run, and into the repo</text>
-  <text x="450" y="296" fill="#9fb0c7" font-size="13" text-anchor="middle"><tspan font-family="ui-monospace,Menlo,monospace">down -v</tspan> rebuilds the whole database from change sets — schema <tspan font-style="italic">and</tspan> data</text>
-</svg></div>
-  <div class="notes">
-    <div class="delta"><b>What's new:</b> <code>db/changelog/**</code> inside the app; the init-script mount is <b>deleted</b>. One owner for the schema.</div>
-    <div class="watch"><b>Watch for:</b> the three breakages you cause on purpose — an edited applied change set (checksum), bad DDL (fails, not recorded), and a stuck <code>DATABASECHANGELOGLOCK</code>.</div>
-  </div>
-
-</section>
-
-<section class="slide ">
-  <div class="head"><div class="badge ">4</div><h2>A second app, and the port fight</h2><div class="sub">branch <code>step-04</code> · ~45 min</div></div>
-  <div class="fig"><svg viewBox="0 0 900 330" role="img" aria-label="After step 4: nginx serves the monitor and proxies the API">
+  <div class="head"><div class="badge ">3</div><h2>A second app, and the port fight</h2><div class="sub">branch <code>step-03</code> · ~45 min</div></div>
+  <div class="fig"><svg viewBox="0 0 900 330" role="img" aria-label="After step 3: nginx serves the monitor and proxies the API">
   <defs><marker id="e" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto">
     <path d="M0,0 L7,3 L0,6 z" fill="#9fb0c7"/></marker></defs>
 
@@ -322,124 +284,132 @@
 </section>
 
 <section class="slide ">
-  <div class="head"><div class="badge five">5</div><h2>The orchestrator loop</h2><div class="sub">branch <code>step-05</code> · ~80 min</div></div>
-  <div class="fig"><svg viewBox="0 0 900 416" role="img" aria-label="After step 5: five services, the feed loop closed">
+  <div class="head"><div class="badge ">4</div><h2>The machine runs the tests</h2><div class="sub">branch <code>step-04</code> · ~45 min</div></div>
+  <div class="fig"><svg viewBox="0 0 900 300" role="img" aria-label="After step 4: a pull request runs ci.yml, which gates the merge behind branch protection">
+  <defs>
+    <marker id="d" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto">
+      <path d="M0,0 L7,3 L0,6 z" fill="#9fb0c7"/></marker>
+    <marker id="dg" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto">
+      <path d="M0,0 L7,3 L0,6 z" fill="#4bd6a0"/></marker>
+  </defs>
+
+  <rect x="20" y="112" width="130" height="64" rx="11" fill="rgba(159,176,199,.14)" stroke="#9fb0c7" stroke-width="1.5"/>
+  <text x="85" y="140" fill="#e8edf5" font-size="14" text-anchor="middle" font-weight="700">push / PR</text>
+  <text x="85" y="160" fill="#9fb0c7" font-size="11.5" text-anchor="middle">code leaves your laptop</text>
+
+  <rect x="182" y="48" width="400" height="190" rx="12" fill="rgba(90,162,255,.06)" stroke="#5aa2ff" stroke-width="1.3" stroke-dasharray="5 5"/>
+  <text x="202" y="72" fill="#5aa2ff" font-size="12.5" font-weight="700">ci.yml · on: push, pull_request</text>
+  <rect x="202" y="90" width="360" height="46" rx="8" fill="rgba(75,214,160,.16)" stroke="#4bd6a0" stroke-width="1.4"/>
+  <text x="382" y="118" fill="#e8edf5" font-size="13.5" text-anchor="middle" font-weight="700">build — <tspan font-family="ui-monospace,Menlo,monospace">./gradlew build</tspan></text>
+  <text x="382" y="158" fill="#9fb0c7" font-size="12" text-anchor="middle">runs your existing JUnit tests — nothing new to write here</text>
+  <text x="382" y="180" fill="#9fb0c7" font-size="12" text-anchor="middle">a fresh Ubuntu VM, every push and every PR</text>
+  <text x="382" y="202" fill="#9fb0c7" font-size="11.5" text-anchor="middle">reports green or red back to the PR</text>
+
+  <rect x="628" y="112" width="140" height="64" rx="11" fill="rgba(230,161,90,.14)" stroke="#e6a15a" stroke-width="1.6" stroke-dasharray="6 4"/>
+  <text x="698" y="138" fill="#e6a15a" font-size="13" text-anchor="middle" font-weight="700">branch protection</text>
+  <text x="698" y="158" fill="#9fb0c7" font-size="11" text-anchor="middle"><tspan font-family="ui-monospace,Menlo,monospace">build</tspan> required</text>
+
+  <rect x="800" y="112" width="90" height="64" rx="11" fill="rgba(75,214,160,.20)" stroke="#4bd6a0" stroke-width="1.8"/>
+  <text x="845" y="138" fill="#e8edf5" font-size="13.5" text-anchor="middle" font-weight="700">merge</text>
+  <text x="845" y="158" fill="#9fb0c7" font-size="11" text-anchor="middle">→ main</text>
+
+  <path d="M150,144 L178,144" stroke="#9fb0c7" stroke-width="1.8" marker-end="url(#d)"/>
+  <path d="M582,144 L624,144" stroke="#9fb0c7" stroke-width="1.8" marker-end="url(#d)"/>
+  <path d="M768,144 L796,144" stroke="#4bd6a0" stroke-width="1.8" marker-end="url(#dg)"/>
+
+  <text x="450" y="272" fill="#e6a15a" font-size="13" text-anchor="middle">break an assertion on purpose → red X on the PR → <tspan font-weight="700">Merge stays grey until it's green again</tspan></text>
+</svg></div>
+  <div class="notes">
+    <div class="delta"><b>What's new:</b> <code>.github/workflows/ci.yml</code> at the <b>repo root</b>, running <code>./gradlew build</code> on every push and pull request against your existing test suite.</div>
+    <div class="watch"><b>Watch for:</b> the value isn't the green — it's the red you make on purpose. Break a test, watch the PR go red, then turn on branch protection so a red build can't be merged.</div>
+  </div>
+
+</section>
+
+<section class="slide ">
+  <div class="head"><div class="badge five">5</div><h2>From green build to blessed deploy</h2><div class="sub">branch <code>step-05</code> · ~45 min</div></div>
+  <div class="fig"><svg viewBox="0 0 960 430" role="img" aria-label="After step 5: a pull request runs ci.yml, gating the merge; merging to main triggers cd.yml, which builds and pushes two images to ghcr and then a gated staging deploy">
   <defs>
     <marker id="f" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto">
       <path d="M0,0 L7,3 L0,6 z" fill="#9fb0c7"/></marker>
     <marker id="fg" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto">
       <path d="M0,0 L7,3 L0,6 z" fill="#4bd6a0"/></marker>
-    <marker id="fv" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto">
-      <path d="M0,0 L7,3 L0,6 z" fill="#e6a15a"/></marker>
   </defs>
 
-  <rect x="20" y="120" width="150" height="66" rx="11" fill="rgba(159,176,199,.12)" stroke="#9fb0c7" stroke-width="1.5"/>
-  <text x="95" y="148" fill="#e8edf5" font-size="14" text-anchor="middle" font-weight="600">browser</text>
-  <text x="95" y="170" fill="#4bd6a0" font-size="12" text-anchor="middle">:3000</text>
+  <!-- ===== TOP LANE: CI on pull_request ===== -->
+  <rect x="24" y="78" width="118" height="54" rx="11" fill="rgba(90,162,255,.14)" stroke="#5aa2ff" stroke-width="1.5"/>
+  <text x="83" y="102" fill="#e8edf5" font-size="13.5" text-anchor="middle" font-weight="700">PR opened</text>
+  <text x="83" y="120" fill="#9fb0c7" font-size="11.5" text-anchor="middle">on a branch</text>
 
-  <rect x="196" y="40" width="692" height="336" rx="14" fill="none" stroke="#5aa2ff" stroke-width="1.5" stroke-dasharray="7 6"/>
-  <text x="216" y="66" fill="#5aa2ff" font-size="13" letter-spacing="1.5">COMPOSE NETWORK — fx-stack</text>
+  <rect x="176" y="44" width="460" height="150" rx="12" fill="rgba(90,162,255,.06)" stroke="#5aa2ff" stroke-width="1.3" stroke-dasharray="5 5"/>
+  <text x="196" y="66" fill="#5aa2ff" font-size="12.5" font-weight="700">ci.yml · on: pull_request — narrowed from Step 4</text>
+  <rect x="196" y="78" width="420" height="28" rx="7" fill="rgba(75,214,160,.16)" stroke="#4bd6a0" stroke-width="1.3"/>
+  <text x="208" y="97" fill="#e8edf5" font-size="12.5">build — <tspan font-family="ui-monospace,Menlo,monospace">./gradlew build</tspan>  (your existing tests)</text>
+  <rect x="196" y="112" width="420" height="28" rx="7" fill="rgba(90,162,255,.16)" stroke="#5aa2ff" stroke-width="1.3"/>
+  <text x="208" y="131" fill="#e8edf5" font-size="12.5">images — <tspan font-family="ui-monospace,Menlo,monospace">docker build</tspan> (no push)</text>
+  <text x="208" y="164" fill="#9fb0c7" font-size="11.5">images is a <tspan font-style="italic">matrix</tspan> — fx-app-spring, fx-monitor — each built, neither pushed</text>
 
-  <rect x="220" y="120" width="190" height="66" rx="11" fill="rgba(90,162,255,.2)" stroke="#5aa2ff" stroke-width="1.8"/>
-  <text x="315" y="148" fill="#e8edf5" font-size="14.5" text-anchor="middle" font-weight="700">fx-monitor</text>
-  <text x="315" y="170" fill="#9fb0c7" font-size="12" text-anchor="middle">nginx :80</text>
+  <rect x="672" y="78" width="120" height="70" rx="11" fill="rgba(230,161,90,.14)" stroke="#e6a15a" stroke-width="1.6" stroke-dasharray="6 4"/>
+  <text x="732" y="102" fill="#e6a15a" font-size="13" text-anchor="middle" font-weight="700">branch</text>
+  <text x="732" y="120" fill="#e6a15a" font-size="13" text-anchor="middle" font-weight="700">protection</text>
+  <text x="732" y="138" fill="#9fb0c7" font-size="11" text-anchor="middle">green required</text>
 
-  <rect x="452" y="104" width="200" height="98" rx="11" fill="rgba(90,162,255,.2)" stroke="#5aa2ff" stroke-width="1.8"/>
-  <text x="552" y="132" fill="#e8edf5" font-size="14.5" text-anchor="middle" font-weight="700">fx-app-spring</text>
-  <text x="552" y="154" fill="#9fb0c7" font-size="12" text-anchor="middle">:8080</text>
-  <text x="552" y="176" fill="#4bd6a0" font-size="11.5" text-anchor="middle">ACCEPTING flag</text>
-  <text x="552" y="194" fill="#9fb0c7" font-size="11.5" text-anchor="middle">/api/feed · /api/admin</text>
+  <rect x="826" y="78" width="110" height="70" rx="11" fill="rgba(75,214,160,.20)" stroke="#4bd6a0" stroke-width="1.8"/>
+  <text x="881" y="108" fill="#e8edf5" font-size="14" text-anchor="middle" font-weight="700">merge</text>
+  <text x="881" y="128" fill="#9fb0c7" font-size="11" text-anchor="middle">→ main</text>
 
-  <rect x="452" y="296" width="200" height="58" rx="11" fill="rgba(199,139,255,.2)" stroke="#c78bff" stroke-width="1.8"/>
-  <text x="552" y="322" fill="#e8edf5" font-size="14" text-anchor="middle" font-weight="600">fx-db</text>
-  <text x="552" y="340" fill="#9fb0c7" font-size="11.5" text-anchor="middle">fxdb · +captured_at</text>
+  <path d="M142,105 L172,105" stroke="#9fb0c7" stroke-width="1.8" marker-end="url(#f)"/>
+  <path d="M636,113 L668,113" stroke="#9fb0c7" stroke-width="1.8" marker-end="url(#f)"/>
+  <path d="M792,113 L822,113" stroke="#4bd6a0" stroke-width="1.8" marker-end="url(#fg)"/>
 
-  <rect x="694" y="104" width="176" height="98" rx="11" fill="rgba(230,161,90,.18)" stroke="#e6a15a" stroke-width="1.8"/>
-  <text x="782" y="132" fill="#e8edf5" font-size="14.5" text-anchor="middle" font-weight="700">fx-orchestrator</text>
-  <text x="782" y="154" fill="#9fb0c7" font-size="12" text-anchor="middle">:8080 → host :8081</text>
-  <text x="782" y="176" fill="#e6a15a" font-size="11.5" text-anchor="middle">given · never edited</text>
-  <text x="782" y="194" fill="#9fb0c7" font-size="11.5" text-anchor="middle">2s / 10s cadence</text>
+  <!-- ===== return sweep: the merge IS the push ===== -->
+  <path d="M881,148 L881,206 L83,206 L83,230" fill="none" stroke="#4bd6a0" stroke-width="1.8" stroke-dasharray="7 5" marker-end="url(#fg)"/>
+  <text x="482" y="199" fill="#4bd6a0" font-size="12" text-anchor="middle">the merge to main IS the push that triggers CD — no commit is built twice</text>
 
-  <rect x="694" y="296" width="176" height="58" rx="11" fill="rgba(199,139,255,.2)" stroke="#c78bff" stroke-width="1.8"/>
-  <text x="782" y="322" fill="#e8edf5" font-size="14" text-anchor="middle" font-weight="600">orchestrator-db</text>
-  <text x="782" y="340" fill="#9fb0c7" font-size="11.5" text-anchor="middle">its own schema</text>
+  <!-- ===== BOTTOM LANE: CD on push main ===== -->
+  <rect x="24" y="232" width="118" height="54" rx="11" fill="rgba(75,214,160,.14)" stroke="#4bd6a0" stroke-width="1.5"/>
+  <text x="83" y="256" fill="#e8edf5" font-size="13.5" text-anchor="middle" font-weight="700">push: main</text>
+  <text x="83" y="274" fill="#9fb0c7" font-size="11.5" text-anchor="middle">(the merge)</text>
 
-  <path d="M174,152 L216,152" stroke="#9fb0c7" stroke-width="1.8" marker-end="url(#f)"/>
-  <path d="M414,152 L448,152" stroke="#4bd6a0" stroke-width="1.8" marker-end="url(#fg)"/>
-  <text x="431" y="142" fill="#4bd6a0" font-size="10.5" text-anchor="middle">/api</text>
-  <path d="M552,206 L552,292" stroke="#9fb0c7" stroke-width="1.8" marker-end="url(#f)"/>
-  <path d="M782,206 L782,292" stroke="#9fb0c7" stroke-width="1.8" marker-end="url(#f)"/>
+  <rect x="176" y="214" width="610" height="176" rx="12" fill="rgba(90,162,255,.06)" stroke="#5aa2ff" stroke-width="1.3" stroke-dasharray="5 5"/>
+  <text x="196" y="236" fill="#5aa2ff" font-size="12.5" font-weight="700">cd.yml · on: push [main]</text>
+  <text x="196" y="256" fill="#9fb0c7" font-size="11.5">split by trigger → the build runs once, then the images ship</text>
 
-  <path d="M690,124 L656,124" stroke="#e6a15a" stroke-width="2" marker-end="url(#fv)"/>
-  <text x="673" y="112" fill="#e6a15a" font-size="10.5" text-anchor="middle">rates</text>
-  <path d="M656,182 L690,182" stroke="#4bd6a0" stroke-width="2" marker-end="url(#fg)"/>
-  <text x="673" y="215" fill="#4bd6a0" font-size="10.5" text-anchor="middle">ack</text>
+  <rect x="196" y="300" width="150" height="60" rx="9" fill="rgba(75,214,160,.18)" stroke="#4bd6a0" stroke-width="1.6"/>
+  <text x="271" y="326" fill="#e8edf5" font-size="13.5" text-anchor="middle" font-weight="700">build</text>
+  <text x="271" y="345" fill="#9fb0c7" font-size="11.5" text-anchor="middle">./gradlew build</text>
 
-  <text x="450" y="404" fill="#9fb0c7" font-size="13" text-anchor="middle">five services · two databases · three sibling apps, each with its own Dockerfile</text>
+  <rect x="372" y="300" width="196" height="60" rx="9" fill="rgba(90,162,255,.20)" stroke="#5aa2ff" stroke-width="1.6"/>
+  <text x="470" y="321" fill="#e8edf5" font-size="13.5" text-anchor="middle" font-weight="700">publish</text>
+  <text x="470" y="339" fill="#9fb0c7" font-size="11" text-anchor="middle">2 images → ghcr.io</text>
+  <text x="470" y="354" fill="#4bd6a0" font-size="11" text-anchor="middle">sha-&lt;short&gt; + latest</text>
+
+  <rect x="594" y="300" width="170" height="60" rx="9" fill="rgba(230,161,90,.18)" stroke="#e6a15a" stroke-width="1.6"/>
+  <text x="679" y="326" fill="#e8edf5" font-size="13.5" text-anchor="middle" font-weight="700">deploy</text>
+  <text x="679" y="345" fill="#9fb0c7" font-size="11" text-anchor="middle">environment: staging</text>
+
+  <rect x="810" y="300" width="128" height="60" rx="9" fill="rgba(230,161,90,.12)" stroke="#e6a15a" stroke-width="1.6" stroke-dasharray="6 4"/>
+  <text x="874" y="324" fill="#e6a15a" font-size="13" text-anchor="middle" font-weight="700">human gate</text>
+  <text x="874" y="343" fill="#9fb0c7" font-size="11" text-anchor="middle">reviewer approves</text>
+
+  <path d="M142,259 L162,259 L162,330 L192,330" fill="none" stroke="#4bd6a0" stroke-width="1.8" marker-end="url(#fg)"/>
+  <path d="M346,330 L368,330" stroke="#9fb0c7" stroke-width="1.8" marker-end="url(#f)"/>
+  <path d="M568,330 L590,330" stroke="#9fb0c7" stroke-width="1.8" marker-end="url(#f)"/>
+  <path d="M764,330 L806,330" stroke="#e6a15a" stroke-width="1.8" marker-end="url(#f)"/>
 </svg></div>
   <div class="notes">
-    <div class="delta"><b>What's new:</b> <code>fx-orchestrator/</code> + <code>orchestrator-db</code>, your <code>POST /api/feed/rates</code>, an <b>outbound</b> ACK over <code>RestTemplate</code>, the ACCEPTING toggle, and change set <code>009</code> on a live database.</div>
-    <div class="watch"><b>Watch for:</b> your answer sets the upstream cadence — ACCEPTED means the next batch in 2s, DECLINED means 10s. You are on the deciding end of someone else's loop.</div>
+    <div class="delta"><b>What's new:</b> <code>ci.yml</code> narrowed to <code>pull_request</code> plus a build-only <code>images</code> matrix; a new <code>cd.yml</code> on <code>push: [main]</code> chains <code>build → publish → deploy</code>, publishing <b>two</b> images — <code>fx-app-spring</code> and <code>fx-monitor</code>.</div>
+    <div class="watch"><b>Watch for:</b> <code>deploy</code> sits behind <code>environment: staging</code> with a required reviewer — the run visibly pauses in <b>Waiting</b> until a human approves. GHCR owners must be <b>lowercase</b> or the push 400s.</div>
   </div>
 
 </section>
 
 <section class="slide ">
-  <div class="head"><h2>What's actually going on — the feed loop</h2></div>
-  <div class="fig"><svg viewBox="0 0 900 430" role="img" aria-label="Sequence diagram of the rate feed loop">
-  <defs><marker id="s" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto">
-    <path d="M0,0 L7,3 L0,6 z" fill="#9fb0c7"/></marker>
-    <marker id="sg" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto">
-      <path d="M0,0 L7,3 L0,6 z" fill="#4bd6a0"/></marker></defs>
-
-  <rect x="60" y="16" width="190" height="40" rx="9" fill="rgba(230,161,90,.18)" stroke="#e6a15a" stroke-width="1.6"/>
-  <text x="155" y="42" fill="#e8edf5" font-size="14" text-anchor="middle" font-weight="700">fx-orchestrator</text>
-  <rect x="360" y="16" width="190" height="40" rx="9" fill="rgba(90,162,255,.2)" stroke="#5aa2ff" stroke-width="1.6"/>
-  <text x="455" y="42" fill="#e8edf5" font-size="14" text-anchor="middle" font-weight="700">fx-app-spring</text>
-  <rect x="660" y="16" width="180" height="40" rx="9" fill="rgba(199,139,255,.2)" stroke="#c78bff" stroke-width="1.6"/>
-  <text x="750" y="42" fill="#e8edf5" font-size="14" text-anchor="middle" font-weight="700">fxdb</text>
-
-  <line x1="155" y1="56" x2="155" y2="400" stroke="#2a3852" stroke-width="1.5" stroke-dasharray="5 5"/>
-  <line x1="455" y1="56" x2="455" y2="400" stroke="#2a3852" stroke-width="1.5" stroke-dasharray="5 5"/>
-  <line x1="750" y1="56" x2="750" y2="400" stroke="#2a3852" stroke-width="1.5" stroke-dasharray="5 5"/>
-
-  <path d="M155,92 L451,92" stroke="#e6a15a" stroke-width="1.8" marker-end="url(#s)"/>
-  <text x="303" y="84" fill="#e8edf5" font-size="12.5" text-anchor="middle">POST /api/feed/rates — 10 fresh rates</text>
-
-  <path d="M455,124 L159,124" stroke="#9fb0c7" stroke-width="1.6" stroke-dasharray="6 4" marker-end="url(#s)"/>
-  <text x="303" y="116" fill="#9fb0c7" font-size="12.5" text-anchor="middle">202 Accepted — "got it, answer follows"</text>
-
-  <rect x="330" y="146" width="250" height="34" rx="8" fill="rgba(75,214,160,.14)" stroke="#4bd6a0" stroke-width="1.3"/>
-  <text x="455" y="168" fill="#4bd6a0" font-size="12.5" text-anchor="middle" font-weight="600">is ACCEPTING on?</text>
-
-  <path d="M455,206 L746,206" stroke="#4bd6a0" stroke-width="1.8" marker-end="url(#sg)"/>
-  <text x="600" y="198" fill="#4bd6a0" font-size="12.5" text-anchor="middle">yes → INSERT × 10 (captured_at = now)</text>
-
-  <path d="M451,246 L159,246" stroke="#4bd6a0" stroke-width="1.8" marker-end="url(#sg)"/>
-  <text x="303" y="238" fill="#4bd6a0" font-size="12.5" text-anchor="middle">POST /api/feed/ack {"status":"ACCEPTED"}</text>
-  <rect x="52" y="262" width="206" height="30" rx="8" fill="rgba(75,214,160,.14)" stroke="#4bd6a0" stroke-width="1.3"/>
-  <text x="155" y="282" fill="#4bd6a0" font-size="12.5" text-anchor="middle" font-weight="600">wait 2s, send the next</text>
-
-  <line x1="40" y1="312" x2="860" y2="312" stroke="#2a3852" stroke-width="1"/>
-  <text x="70" y="336" fill="#e6a15a" font-size="12.5" font-weight="700">ALT — toggle OFF</text>
-
-  <path d="M451,362 L159,362" stroke="#e6a15a" stroke-width="1.8" marker-end="url(#s)"/>
-  <text x="303" y="354" fill="#e6a15a" font-size="12.5" text-anchor="middle">nothing stored · ack {"status":"DECLINED"}</text>
-  <rect x="52" y="376" width="206" height="30" rx="8" fill="rgba(230,161,90,.16)" stroke="#e6a15a" stroke-width="1.3"/>
-  <text x="155" y="396" fill="#e6a15a" font-size="12.5" text-anchor="middle" font-weight="600">back off — wait 10s</text>
-</svg></div>
-  <div class="notes one">
-    <div class="watch"><b>Watch for:</b> The ACK is a <b>second HTTP call</b>, not the response to the first — which is why your app has to be an HTTP <i>client</i> as well as a server. That is backpressure, and you control it.</div>
-  </div>
-
-</section>
-
-<section class="slide ">
-  <div class="head"><h2>What “done” looks like</h2><div class="sub">end of Step 5</div></div>
-  <div class="shotwrap"><img class="shot" src="fx-monitor-final.jpg" alt="fx-monitor after step 5: ten currency pairs with live rates, coloured last-change values, sparkline trends, the ACCEPTING toggle ON, and a feed panel reading 65 updates received, 2.0 s feed interval, last update 2s ago, 10 pairs."></div>
+  <div class="head"><h2>What "done" looks like</h2><div class="sub">end of Step 5</div></div>
+  <div class="shotwrap"><img class="shot" src="fx-monitor-final.jpg" alt="fx-monitor after step 5: ten currency pairs ticking live, sparklines filling in, a green health dot, and the ACCEPTING toggle ON."></div>
   <div class="notes">
-    <div class="delta"><b>What's new:</b> rates moving every two seconds, numbers flashing green or red, ~90s of history per pair, feed interval <b>2.0 s</b>.</div>
-    <div class="watch"><b>Watch for:</b> flip <b>ACCEPTING</b> off and it all freezes — trend lines go flat, <i>Last update</i> climbs and turns amber, and the orchestrator drops to one batch every ten seconds.</div>
+    <div class="delta"><b>What's new:</b> three containers up from one <code>docker compose up</code>, a pipeline that verifies every push, and two images on GHCR behind a deploy a human had to approve.</div>
+    <div class="watch"><b>Watch for:</b> the <b>ACCEPTING</b> toggle reads ON and the rates move every couple of seconds — <code>fx-app-spring</code> ticks its own feed on a schedule, no second app needed.</div>
   </div>
 
 </section>
@@ -449,7 +419,7 @@
 <nav class="deckbar">
   <button class="nbtn" id="prev" aria-label="Previous slide">&#8249;</button>
   <button class="nbtn" id="next" aria-label="Next slide">&#8250;</button>
-  <span class="counter" id="counter">1 / 9</span>
+  <span class="counter" id="counter">1 / 8</span>
   <a class="home" href="overview-steps-01-05.html">← task overview</a>
   <div class="dots" id="dots"></div>
 </nav>

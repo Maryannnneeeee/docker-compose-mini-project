@@ -1,8 +1,8 @@
 # FX exchange — a build-it-yourself mini-project
 
-Nine steps that take one Spring Boot application from a jar on your laptop to a three-service
-containerised stack with a migrated schema, three tiers of tests, and a pipeline that publishes
-images to a container registry behind a human approval gate.
+Five steps that take one Spring Boot application from a jar on your laptop to a three-service
+containerised stack, tested and gated by a pipeline that publishes images to a container registry
+behind a human approval gate.
 
 You write the code. Each step has an instruction sheet, and a complete working answer you should
 only open after you have struggled with it.
@@ -13,26 +13,22 @@ only open after you have struggled with it.
 |---|---|---|
 | 1 | [Put it in a box](steps/01-dockerfile.md) | a multi-stage `Dockerfile` and a `.dockerignore`, and an image that runs with no JDK on the host |
 | 2 | [The whole stack in one file](steps/02-compose-mysql.md) | `docker-compose.yml` — the app plus a healthchecked MySQL, one command |
-| 3 | [Liquibase owns the schema](steps/03-liquibase.md) | the schema as code; the hand-imported seed script is gone |
-| 4 | [A second app, and the port fight](steps/04-monitor-and-ports.md) | `fx-monitor` in the stack, and a lesson about host ports |
-| 5 | [The orchestrator loop](steps/05-orchestrator-feed.md) | a live rate feed pushing batches, an ACK contract, and a toggle that changes an upstream service's behaviour |
-| 6 | [The three altitudes](steps/06-test-tiers.md) | a mocked unit test, a `@WebMvcTest` slice, and a Testcontainers integration test |
-| 7 | [The machine runs the tests](steps/07-ci-pipeline.md) | `ci.yml`, a deliberately red PR, and branch protection that blocks it |
-| 8 | [Supply chain & Definition of Done](steps/08-supply-chain.md) | a dependency inventory, Dependabot as code, and a five-point DoD |
-| 9 | [From green build to blessed deploy](steps/09-cd-ghcr.md) | `cd.yml` publishing three images to GHCR, gated on a human |
+| 3 | [A second app, and the port fight](steps/03-monitor-and-ports.md) | `fx-monitor` in the stack, and a lesson about host ports |
+| 4 | [The machine runs the tests](steps/04-ci-pipeline.md) | `ci.yml` running your existing tests, a deliberately red PR, and branch protection that blocks it |
+| 5 | [From green build to blessed deploy](steps/05-cd-ghcr.md) | `cd.yml` publishing two images to GHCR, gated on a human |
 
-Two overview decks with checkpoints and cheatsheets: [steps 1–5](decks/overview-steps-01-05.html)
-and [steps 6–9](decks/overview-steps-06-09.html). Architecture diagrams:
-[1–5](decks/architecture-steps-01-05.html), [6–9](decks/architecture-steps-06-09.html).
+Overview deck with checkpoints and a cheatsheet: [steps 1–5](decks/overview-steps-01-05.html).
+Architecture diagrams: [the click-through deck](decks/architecture-steps-01-05.html) or
+[the plain images](decks/diagrams/).
 
 ## Layout
 
 ```
 mini-project/
 ├── start/        the code as you receive it — copy this to begin
-├── given/        two applications you don't write; they arrive at steps 4 and 5
-├── steps/        the nine instruction sheets
-├── solutions/    step-01 … step-09, each a complete working tree
+├── given/        an application you don't write; it arrives at step 3
+├── steps/        the five instruction sheets
+├── solutions/    step-01 … step-05, each a complete working tree
 └── decks/        overview and architecture decks, plus diagrams
 ```
 
@@ -40,45 +36,57 @@ mini-project/
 own. Use them as a parachute if a step goes wrong: copy the previous step's folder over your work
 and carry on rather than losing an hour to a bad merge.
 
+Once you've done the "Getting started" step below, `fx-exchange/` appears here too, as a new
+sibling of `start/`, `given/`, `steps/` and `decks/` — that folder is your workspace, and
+everything you build lives inside it.
+
 ## Getting started
 
-You need Docker Desktop, a JDK 21, and a GitHub account. You do **not** need Gradle or MySQL
-installed — the Gradle wrapper and the containers handle both.
+You need a GitHub account. **Fork this repository** into your own account, then open your fork —
+either in a **GitHub Codespace** (Code → Codespaces → Create codespace on main) or cloned locally.
+Either way, you already have git initialized, `origin` pointing at your fork, and `main` holding
+everything you're reading right now.
+
+A Codespace already has Docker and a JDK on it — confirm with `docker --version` and
+`java -version` before you start. Working locally instead, you need Docker Desktop and a JDK 21 of
+your own. Either way you do **not** need Gradle or MySQL installed — the Gradle wrapper and the
+containers handle both.
+
+From the root of your fork, make the workspace you'll build everything in:
 
 ```bash
-mkdir fx-exchange && cd fx-exchange
-git init -b main
-cp -R ../mini-project/start/. .
+mkdir fx-exchange
+cp -R start/fx-app-spring fx-exchange/
+cp start/README.md fx-exchange/README.md
+cd fx-exchange
 ```
 
 Then open [steps/01-dockerfile.md](steps/01-dockerfile.md).
 
-Work on a branch per step (`step-01`, `step-02`, …) and merge each one to `main` through a pull
-request. It costs nothing while you are alone in the repo and is the only habit that scales once
-you are not — and from step 7 onwards the pipeline depends on it.
+Work on a branch per step (`step-01`, `step-02`, …) and merge each one to your fork's `main`
+through a pull request. It costs nothing while you are alone in the repo and is the only habit
+that scales once you are not — and from step 4 onwards the pipeline depends on it.
 
 ## What you are building
 
-Three applications that run side by side as one stack:
+Two applications that run side by side as one stack:
 
 | Folder | What it is | Arrives at |
 |---|---|---|
-| `fx-app-spring/` | the API and its database — rates, conversions, feed intake | step 1 (you build it) |
-| `fx-monitor/` | live web view of the rates, static files behind nginx | step 4 (given) |
-| `fx-orchestrator/` | upstream rate feed with its own database | step 5 (given) |
+| `fx-app-spring/` | the API and its database — rates, conversions, and its own live rate feed | step 1 (you build it) |
+| `fx-monitor/` | live web view of the rates, static files behind nginx | step 3 (given) |
 
-By step 9 that is five containers, two databases, three published images and a deploy that waits
+By step 5 that is three containers, one database, two published images and a deploy that waits
 for someone to say yes.
 
 ## A note on ports
 
-The stack publishes host ports 8080 (API), 3000 (monitor), 8081 (feed), 3307 and 3308 (the two
-databases). If something else on your machine already holds one, don't edit `docker-compose.yml` —
-copy `.env.example` to `.env` and override it there:
+The stack publishes host ports 8080 (API), 3000 (monitor) and 3307 (the database). If something
+else on your machine already holds one, don't edit `docker-compose.yml` — copy `.env.example` to
+`.env` and override it there:
 
 ```bash
 MONITOR_PORT=3100
-ORCH_PORT=8091
 ```
 
 `docker compose up` fails with *"port is already allocated"* when this bites, and a container that

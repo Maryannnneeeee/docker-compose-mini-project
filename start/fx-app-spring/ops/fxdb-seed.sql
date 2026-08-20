@@ -9,7 +9,7 @@ CREATE TABLE account (id INT PRIMARY KEY AUTO_INCREMENT, owner_name VARCHAR(60) 
   currency_code CHAR(3) NOT NULL, balance DECIMAL(12,2) NOT NULL DEFAULT 0, account_type VARCHAR(10) NOT NULL,
   FOREIGN KEY (currency_code) REFERENCES currency(code));
 CREATE TABLE fx_rate (id INT PRIMARY KEY AUTO_INCREMENT, base_code CHAR(3) NOT NULL, quote_code CHAR(3) NOT NULL,
-  rate DECIMAL(12,4) NOT NULL, rate_date DATE NOT NULL,
+  rate DECIMAL(12,4) NOT NULL, rate_date DATE NOT NULL, captured_at DATETIME(3) NULL,
   FOREIGN KEY (base_code) REFERENCES currency(code), FOREIGN KEY (quote_code) REFERENCES currency(code));
 CREATE TABLE transfer (id INT PRIMARY KEY AUTO_INCREMENT, from_account INT NOT NULL, to_account INT NOT NULL,
   amount DECIMAL(12,2) NOT NULL, currency_code CHAR(3) NOT NULL, executed_at DATETIME NOT NULL, status VARCHAR(10) NOT NULL,

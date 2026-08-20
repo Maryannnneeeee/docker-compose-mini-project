@@ -2,10 +2,11 @@ package com.fx;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.scheduling.annotation.EnableScheduling;
 
 /**
  * The currency exchange service: REST endpoints over JDBC against fxdb, serving rates and
- * conversions, accepting rate batches from the upstream feed and ACKing them back.
+ * conversions, and ticking its own live rate feed on a schedule (com.fx.feed).
  *
  * One annotation does three things here: @SpringBootApplication is @Configuration +
  * @EnableAutoConfiguration + @ComponentScan. The scan starts in THIS class's package
@@ -13,6 +14,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
  * and why this class must stay at the root of the package tree.
  */
 @SpringBootApplication
+@EnableScheduling
 public class FxAppSpringApplication {
 
     public static void main(String[] args) {

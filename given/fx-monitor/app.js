@@ -42,8 +42,8 @@ let polls = 0;
 let adminAvailable = null;   // null = not yet probed
 
 /*
- * We poll once a second, but the feed only moves when the orchestrator pushes a batch the API
- * accepts — every ~2s while ACCEPTING is ON, every ~10s once it is OFF. So counting polls
+ * We poll once a second, but the feed only moves when fx-app-spring's own scheduler ticks a
+ * new batch — every ~2s while ACCEPTING is ON, never while it's OFF. So counting polls
  * measures this page; counting UPDATES measures the system. We report the latter.
  */
 let updates = 0;            // polls in which at least one rate actually changed

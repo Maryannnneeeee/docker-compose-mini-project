@@ -46,12 +46,12 @@ of its own.
 | **Feed interval** | gap between the last two batches that landed, taken from the server's own `captured_at`. ~**2.0 s** while ACCEPTING is ON. |
 | **Last update** | climbs, and goes amber past 5s. This is what shows the feed being declined. |
 
-The page polls once a second, but the orchestrator only pushes every ~2s, so **about half of all
-polls find nothing new** — which is why the raw poll count is demoted to a footnote.
+The page polls once a second, but `fx-app-spring`'s own feed only ticks every ~2s, so **about
+half of all polls find nothing new** — which is why the raw poll count is demoted to a footnote.
 
-**Switch ACCEPTING off and the interval does *not* rise to 10s.** A declined batch is never
-stored, so it leaves no trace in the data at all: updates simply stop, and *Last update* climbs.
-The 10-second backoff is real but only visible in `docker compose logs -f fx-orchestrator`.
+**Switch ACCEPTING off and updates simply stop.** The scheduler inside `fx-app-spring` keeps
+running every 2s either way — it just skips writing a new row while accepting is off, so a
+declined tick leaves no trace in the data at all, and *Last update* climbs instead.
 
 ### Why it doesn't flicker
 

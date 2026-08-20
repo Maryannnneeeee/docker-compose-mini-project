@@ -68,9 +68,9 @@
         landed, taken from the server's own <code>captured_at</code> — so it reads about
         <strong>2s</strong> while ACCEPTING is ON. Switch ACCEPTING <strong>OFF</strong> and
         nothing is stored at all, so updates stop dead: <strong>Last update</strong> climbs and
-        goes amber, and the interval simply holds its last value. The orchestrator is still
-        calling every 10s — you can see that in <code>docker compose logs -f fx-orchestrator</code>,
-        not here, because a declined batch leaves no trace in the data.
+        goes amber, and the interval simply holds its last value. <code>fx-app-spring</code>'s
+        own scheduler keeps ticking every 2s regardless — it just skips the insert while
+        declined, so nothing shows up here because a declined tick leaves no trace in the data.
         This page polls once a second regardless, and most of those polls find nothing new —
         which is why the poll count is not the interesting number
         (<span id="poll-count">0</span> so far).
